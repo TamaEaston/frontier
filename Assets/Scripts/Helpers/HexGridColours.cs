@@ -7,12 +7,36 @@ namespace Helpers
 {
     public class HexGridColours
     {
-        public Color GetAltitudeColour(float heightAboveSeaLevel)
+        public Color GetBiomeColour(float heightAboveSeaLevel, float SurfaceWater, float Temperature)
         {
             if (heightAboveSeaLevel < 0)
             {
-                float t = Mathf.InverseLerp(-10000, 0, heightAboveSeaLevel);
-                return Color.Lerp(new Color(0, 0, 0.5f), new Color(0.4f, 0.7f, 0.8f), t); // Dark Blue to Light Sea Blue
+                if (Temperature > -10)
+                {
+                    float t = Mathf.InverseLerp(-10000, 0, heightAboveSeaLevel);
+                    return Color.Lerp(new Color(0, 0, 0.5f), new Color(0.4f, 0.7f, 0.8f), t); // Dark Blue to Light Sea Blue
+                }
+                else
+                {
+                    return new Color(0.9f, 0.9f, 1.0f); // Very Light Blue
+                }
+            }
+            else if (
+                SurfaceWater >= 100)
+            {
+                if (Temperature > -5)
+                {
+                    return new Color(0.0f, 0.5f, 0.5f);
+                }
+                else
+                {
+                    return new Color(0.6f, 0.8f, 1.0f); // Light Blue
+                }
+            }
+            else if (Temperature < -5)
+            {
+                float t = Mathf.InverseLerp(0, 5000, heightAboveSeaLevel);
+                return Color.Lerp(new Color(0.9f, 0.9f, 0.9f), Color.white, t);
             }
             else if (heightAboveSeaLevel <= 50)
             {
@@ -23,16 +47,112 @@ namespace Helpers
                 float t = Mathf.InverseLerp(51, 2500, heightAboveSeaLevel);
                 return Color.Lerp(new Color(0.5f, 0.8f, 0.2f), new Color(0.13f, 0.55f, 0.13f), t); // Grass Green to Forest Green
             }
-            else if (heightAboveSeaLevel <= 5000)
+            else
             {
                 float t = Mathf.InverseLerp(2501, 5000, heightAboveSeaLevel);
-                return Color.Lerp(new Color(0.5f, 0.5f, 0.5f), Color.white, t); // Rock Grey to Snow White
+                return Color.Lerp(new Color(0.5f, 0.5f, 0.5f), new Color(0.8f, 0.8f, 0.8f), t); // Rock Grey to Light Rock Grey
+            }
+        }
+
+        public Color GetAltitudeColour(float heightAboveSeaLevel, float SurfaceWater, float Temperature)
+        {
+            if (heightAboveSeaLevel < 0)
+            {
+                float t = Mathf.InverseLerp(-10000, 0, heightAboveSeaLevel);
+                return Color.Lerp(Color.black, new Color(0.4f, 0.7f, 0.8f), t); // Black to Light Sea Blue
+            }
+            else if (SurfaceWater >= 100)
+            {
+                if (Temperature > -5)
+                {
+                    return new Color(0.0f, 0.5f, 0.5f);
+                }
+                else
+                {
+                    return new Color(0.6f, 0.8f, 1.0f); // Light Blue
+                }
             }
             else
             {
-                float t = Mathf.InverseLerp(5001, 10000, heightAboveSeaLevel);
-                return Color.Lerp(Color.white, new Color(0.9f, 0.9f, 1f), t); // Snow White to White with Blue Tint
+                float t = Mathf.InverseLerp(0, 10000, heightAboveSeaLevel);
+                return Color.Lerp(new Color(0.13f, 0.55f, 0.13f), Color.white, t); // Forest Green to White
             }
+
+        }
+
+        public Color GetRainfallColour(float heightAboveSeaLevel, float SurfaceWater, float Rainfall)
+        {
+            if (heightAboveSeaLevel < 0)
+            {
+                float t = Mathf.InverseLerp(-10000, 0, heightAboveSeaLevel);
+                return Color.Lerp(new Color(0, 0, 0.5f), new Color(0.4f, 0.7f, 0.8f), t); // Dark Blue to Light Sea Blue
+            }
+            else if (SurfaceWater >= 100)
+            {
+                return new Color(0.0f, 0.5f, 0.5f);
+            }
+            else
+            {
+                float t = Mathf.InverseLerp(0, 50, Rainfall);
+                return Color.Lerp(Color.yellow, new Color(0, 0.39f, 0), t); // Yellow to Dark Green
+            }
+
+        }
+
+        public Color GetTemperatureColour(float heightAboveSeaLevel, float SurfaceWater, float Temperature)
+        {
+            if (heightAboveSeaLevel < 0)
+            {
+                float t = Mathf.InverseLerp(-40, 40, Temperature);
+                return Color.Lerp(new Color(0.9f, 0.9f, 1f), new Color(0, 0, 0.5f), t); // Icy Blue Tint to Dark Blue
+            }
+            else if (SurfaceWater >= 100)
+            {
+                if (Temperature > -5)
+                {
+                    return new Color(0.0f, 0.5f, 0.5f);
+                }
+                else
+                {
+                    return new Color(0.6f, 0.8f, 1.0f); // Light Blue
+                }
+            }
+
+            else
+            {
+                float t;
+                Color startColour, endColour;
+
+                if (Temperature >= 0 && Temperature <= 20)
+                {
+                    // For temperatures between 0 and 20, range from light green to dark green
+                    t = Mathf.InverseLerp(0, 20, Temperature);
+                    startColour = new Color(0.56f, 0.93f, 0.56f); // Light Green
+                    endColour = new Color(0.0f, 0.5f, 0.0f); // Dark Green
+                }
+                else if (Temperature > 20)
+                {
+                    t = Mathf.InverseLerp(20, 35, Temperature);
+                    startColour = new Color(0.0f, 0.5f, 0.0f); // Dark Green
+                    endColour = new Color(1.0f, 0.5f, 0.0f); // Orange
+                }
+                else
+                {
+                    // For other temperatures, range from white to red
+                    t = Mathf.InverseLerp(-35, 0, Temperature);
+                    startColour = Color.white;
+                    endColour = new Color(0.56f, 0.93f, 0.56f); // Light Green
+                }
+
+                return Color.Lerp(startColour, endColour, t);
+            }
+
+        }
+
+        public Color GetMagmaColour(float magmaIntensity)
+        {
+            float t = Mathf.InverseLerp(0, 100, magmaIntensity); // Normalize magmaIntensity to the range [0, 1]
+            return Color.Lerp(Color.yellow, Color.red, t); // Interpolate from Yellow to Red
         }
         public Color GetPlateColour(char plateId)
         {
@@ -49,5 +169,37 @@ namespace Helpers
             // Convert the HSV color to RGB and return it.
             return Color.HSVToRGB(hue, 1, 1);
         }
+
+        public Color GetHumanComfortColour(float heightAboveSeaLevel, float SurfaceWater, float HumanComfortIndex)
+        {
+            if (heightAboveSeaLevel < 0)
+            {
+                float t = Mathf.InverseLerp(-10000, 0, heightAboveSeaLevel);
+                return Color.Lerp(new Color(0, 0, 0.5f), new Color(0.4f, 0.7f, 0.8f), t); // Dark Blue to Light Sea Blue
+            }
+            else if (SurfaceWater >= 100)
+            {
+                return new Color(0.0f, 0.5f, 0.5f);
+            }
+            else
+            {
+                if (HumanComfortIndex < 10)
+                {
+                    return Color.black;
+                }
+                else if (HumanComfortIndex <= 40)
+                {
+                    float t = Mathf.InverseLerp(10, 40, HumanComfortIndex);
+                    return Color.Lerp(Color.red, Color.yellow, t);
+                }
+                else
+                {
+                    float t = Mathf.InverseLerp(40, 100, HumanComfortIndex);
+                    return Color.Lerp(Color.yellow, new Color(0.0f, 0.5f, 0.0f), t);
+                }
+            }
+
+        }
+
     }
 }

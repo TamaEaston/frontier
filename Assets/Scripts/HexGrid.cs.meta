@@ -3,7 +3,10 @@ guid: 14a8876d7fce28848ac1427573b57bc0
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - HexagonPrefab: {instanceID: 0}
+  - MagmaOverlayPrefab: {instanceID: 0}
+  - SeaLevelTextPrefab: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

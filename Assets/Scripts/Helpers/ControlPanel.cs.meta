@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6842ff6decb76d44189e709f43a28cf5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - populationText: {instanceID: 0}
+  - hexGrid: {instanceID: 0}
+  - magmaButton: {instanceID: 0}
+  - blackArrow: {fileID: 10912, guid: 0000000000000000f000000000000000, type: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,10 +1,13 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using UnityEngine.Rendering.VirtualTexturing;
 using UnityEditorInternal;
 using Helpers;
+using TMPro;
 
 public class TectonicPlate
 {
@@ -17,65 +20,104 @@ public class TectonicPlate
 public class HexGrid : MonoBehaviour
 {
     public Hexagon HexagonPrefab;
-    public MagmaOverlay MagmaOverlayPrefab;
+    public Arrow ArrowPrefab;
+    public Settlement SettlementPrefab;
+    public TextMeshProUGUI SeaLevelTextPrefab;
     public int Width;
     public int Height;
     public int NumberOfPlates;
     private int MinHexagonsPerPlate;
+    public float EquatorSolarIntensity;
+    public int EquatorToPolarSolarIntensityDifference;
+
+    public int Era = 0;
     public float SeaLevel = 10000;
+    public float GenesisSeaLevel = 10000;
+    public float SeaPerHex = 0;
+    public float AverageGlobalTemperature = 15;
 
     private Hexagon[,] hexagons;
-
     public Hexagon[,] GetHexagons()
     {
         return hexagons;
     }
-    public HexGridColours colours = new HexGridColours();
-    public List<TectonicPlate> tectonicPlates = new List<TectonicPlate>();
-    public List<DisplayOverlay> Overlays { get; set; }
 
+    private Arrow[,] arrows;
+    public Arrow[,] GetArrows()
+    {
+        return arrows;
+    }
+    private Settlement[,] settlements;
+    public Settlement[,] GetSettlements()
+    {
+        return settlements;
+    }
+
+    private RiverOverlay[,] riverLines;
+    public RiverOverlay[,] getRiverLines()
+    {
+        return riverLines;
+    }
+
+
+    public HexGridColours colours = new HexGridColours();
+    List<TectonicPlate> tectonicPlates = new List<TectonicPlate>();
+    public BiomeLoader biomeLoader;
+    public List<Biome> biomes;
 
     void Start()
     {
+
         NumberOfPlates = Mathf.Min(NumberOfPlates, 24); // Apply the restriction
         hexagons = new Hexagon[Width, Height];
+        arrows = new Arrow[Width, Height];
+        settlements = new Settlement[Width, Height];
 
-        float xDistance = 0.9f; // Adjust this value as necessary
-        float yDistance = Mathf.Sqrt(3) * 0.45f; // Adjust this value as necessary
+        float xDistance = 1.2f; // Adjust this value as necessary
+        float yDistance = Mathf.Sqrt(3) * 0.6f; // Adjust this value as necessary
 
-
-        for (int x = 0; x < Width; x++)
+        for (int i = 0; i < Width; i++)
         {
-            for (int y = 0; y < Height; y++)
+            for (int j = 0; j < Height; j++)
             {
-                float xOffset = (y % 2 == 0) ? 0 : xDistance / 2;
+                float xOffset = (j % 2 == 0) ? 0 : xDistance / 2;
                 float centerOffsetX = (Width * xDistance) / 2;
                 float centerOffsetY = (Height * yDistance) / 2;
+                float positionX = i * xDistance + xOffset - centerOffsetX;
+                float positionY = j * yDistance - centerOffsetY;
 
-                float positionX = x * xDistance + xOffset - centerOffsetX;
-                float positionY = y * yDistance - centerOffsetY;
+                // Assuming this is line 80
+                Hexagon hex = Instantiate(HexagonPrefab, new Vector3(positionX, positionY, 0), Quaternion.identity);
+                Arrow arrow = Instantiate(ArrowPrefab, new Vector3(positionX, positionY, -5), Quaternion.identity);
+                Settlement settlement = Instantiate(SettlementPrefab, new Vector3(positionX, positionY, -4), Quaternion.identity);
 
-                Hexagon hex = Instantiate(HexagonPrefab, new Vector3(positionX, positionY, 0), Quaternion.Euler(0, 0, 90));
+                hex.hexGrid = this;
 
-                hex.PosX = positionX;
-                hex.PosY = positionY;
-
-                DisplayOverlay magmaOverlay = Instantiate(MagmaOverlayPrefab, new Vector3(positionX, positionY, 0), Quaternion.Euler(0, 0, 90));
+                // Set the ID & position of the hexagon
+                hex.HexagonID = i + "-" + j;
+                hex.PositionX = i;
+                hex.PositionY = j;
 
                 // Assign a random altitude
-                hex.Altitude = Random.Range(9500, 10501);
-                float heightAboveSeaLevel = hex.Altitude - SeaLevel;
-                hex.SpriteRenderer.color = colours.GetAltitudeColour(heightAboveSeaLevel);
+                hex.Altitude = Random.Range(9000, 11000);
+                hex.AltitudeOld = hex.Altitude;
 
-                // Assign magma intensity & direction as West
+                // Assign magma intensity & direction as East
                 hex.MagmaIntensity = 25;
-                hex.MagmaDirection = 270;
+                hex.MagmaDirection = 90;
 
-                // assign wind intensity & direction as East
-                hex.WindIntensity = 25;
-                hex.WindDirection = 90;
+                // Assign Rainfall for testing
+                hex.Rainfall = 25;
 
-                hexagons[x, y] = hex;
+                // Calculate solar intensity
+                float latitude = Mathf.Clamp(2.0f * j / (Height - 1) - 1.0f, -1.0f, 1.0f);
+                float power = 0.6f;
+                float sinValue = Mathf.Sin((latitude + 1) * Mathf.PI / 2.0f);
+                hex.SolarIntensity = (EquatorSolarIntensity - EquatorToPolarSolarIntensityDifference) + EquatorToPolarSolarIntensityDifference * Mathf.Pow(Mathf.Abs(sinValue), power);
+
+                hexagons[i, j] = hex;
+                arrows[i, j] = arrow;
+                settlements[i, j] = settlement;
             }
         }
 
@@ -84,24 +126,35 @@ public class HexGrid : MonoBehaviour
         {
             for (int j = 0; j < Height; j++)
             {
-                hexagons[i, j].Neighbours[0] = hexagons[(i + 1) % Width, j]; // East
-                hexagons[i, j].Neighbours[1] = j < Height - 1 ? hexagons[(i + 1) % Width, j + 1] : null; // South-East
-                hexagons[i, j].Neighbours[2] = j < Height - 1 ? hexagons[i, j + 1] : null; // South-West
-                hexagons[i, j].Neighbours[3] = hexagons[(i - 1 + Width) % Width, j]; // West
-                hexagons[i, j].Neighbours[4] = j > 0 ? hexagons[(i - 1 + Width) % Width, j - 1] : null; // North-West
-                hexagons[i, j].Neighbours[5] = j > 0 ? hexagons[i, j - 1] : null; // North-East   
-
+                if (j % 2 == 0) // Even row
+                {
+                    hexagons[i, j].Neighbours[0] = hexagons[(i + 1) % Width, j]; // East
+                    hexagons[i, j].Neighbours[1] = j < Height - 1 ? hexagons[i, (j + 1) % Height] : null; // South-East
+                    hexagons[i, j].Neighbours[2] = j < Height - 1 ? hexagons[(i - 1 + Width) % Width, (j + 1) % Height] : null; // South-West
+                    hexagons[i, j].Neighbours[3] = hexagons[(i - 1 + Width) % Width, j]; // West
+                    hexagons[i, j].Neighbours[4] = j > 0 ? hexagons[(i - 1 + Width) % Width, (j - 1 + Height) % Height] : null; // North-West
+                    hexagons[i, j].Neighbours[5] = j > 0 ? hexagons[i, (j - 1 + Height) % Height] : null; // North-East
+                }
+                else // Odd row
+                {
+                    hexagons[i, j].Neighbours[0] = hexagons[(i + 1) % Width, j]; // East
+                    hexagons[i, j].Neighbours[1] = j < Height - 1 ? hexagons[(i + 1) % Width, (j + 1) % Height] : null; // South-East
+                    hexagons[i, j].Neighbours[2] = j < Height - 1 ? hexagons[i, (j + 1) % Height] : null; // South-West
+                    hexagons[i, j].Neighbours[3] = hexagons[(i - 1 + Width) % Width, j]; // West
+                    hexagons[i, j].Neighbours[4] = j > 0 ? hexagons[i, (j - 1 + Height) % Height] : null; // North-West
+                    hexagons[i, j].Neighbours[5] = j > 0 ? hexagons[(i + 1) % Width, (j - 1 + Height) % Height] : null; // North-East
+                }
                 // North-West and North-East neighbours for top row
                 if (j == 0)
                 {
-                    hexagons[i, j].Neighbours[4] = hexagons[Width / 2, 0]; // North-West
-                    hexagons[i, j].Neighbours[5] = hexagons[Width / 2, 0]; // North-East
+                    hexagons[i, j].Neighbours[4] = hexagons[Width / 2, 0]; // North-West (240 degrees / 60 = 4)
+                    hexagons[i, j].Neighbours[5] = hexagons[Width / 2, 0]; // North-East (300 degrees / 60 = 5)
                 }
                 else if (j == Height - 1)
                 // South-East and South-West neighbours for bottom row
                 {
-                    hexagons[i, j].Neighbours[1] = hexagons[Width / 2, Height - 1]; // South-East
-                    hexagons[i, j].Neighbours[2] = hexagons[Width / 2, Height - 1]; // South-West
+                    hexagons[i, j].Neighbours[1] = hexagons[Width / 2, Height - 1]; // South-East (60 degrees / 60 = 1)
+                    hexagons[i, j].Neighbours[2] = hexagons[Width / 2, Height - 1]; // South-West (120 degrees / 60 = 2)
                 }
             }
         }
@@ -111,82 +164,226 @@ public class HexGrid : MonoBehaviour
         MinHexagonsPerPlate = NumbersOfHexagons / NumberOfPlates;
         for (int i = 0; i < NumberOfPlates; i++)
         {
-            GenerateTectonicPlate();
+            TectonicPlateGenerator generator = new TectonicPlateGenerator();
+            generator.GenerateTectonicPlate(hexagons, Width, Height, tectonicPlates, MinHexagonsPerPlate, null);
         }
 
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch.Start();
+        GeoPhase phase = new GeoPhase(this, biomes);
+        int NumberOfGeoPhases = 25;
+        for (int i = 0; i < NumberOfGeoPhases; i++)
+        {
+            phase.ExecuteMagmaImpact();
+            phase.ExecuteSlump();
+            phase.ExecuteSeaLevel();
+            phase.ExecuteWindEffect();
+            phase.ExecuteRiverFlow();
+        }
+        UnityEngine.Debug.Log("Time taken for " + NumberOfGeoPhases + " GeoPhases : " + stopwatch.ElapsedMilliseconds + " ms. Average: " + stopwatch.ElapsedMilliseconds / NumberOfGeoPhases + " ms");
+        phase.ExecuteHumanComfortAssessment();
+        GenesisSeaLevel = SeaLevel;
+        AddHumanPopulation();
+        phase.ExecuteSetBiomes();
+        phase.ExecuteRefreshHexDisplay();
 
     }
 
     void Update()
     {
+
+        // if (biomes == null)
+        // {
+        //     UnityEngine.Debug.LogError("Biomes is null in Update");
+        // }
+        // else
+        // {
+        //     UnityEngine.Debug.Log("Number of biomes in Update: " + biomes.Count);
+        // }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
-
-            GeoPhase phase = new GeoPhase(this, SeaLevel); // Replace SeaLevel with the actual sea level value
+            Era += 1;
+            GeoPhase phase = new GeoPhase(this, biomes);
+            phase.ExecuteClimateTemperature();
             phase.ExecuteMagmaImpact();
             phase.ExecuteSlump();
+            phase.ExecuteSeaLevel();
+            phase.ExecuteWindEffect();
+            phase.ExecuteRiverFlow();
+            phase.ExecuteHumanComfortAssessment();
+            phase.ExecutePopulationGrowth();
+            phase.ExecuteSetBiomes();
             phase.ExecuteRefreshHexDisplay();
 
             stopwatch.Stop();
             UnityEngine.Debug.Log("Time taken: " + stopwatch.ElapsedMilliseconds + " ms");
         }
-    }
 
-
-    void GenerateTectonicPlate()
-    {
-        Hexagon startHex = null;
-        int attempts = 0;
-        int maxAttempts = Width * Height;
-        
-        do
+        //Toggle Overlays
+        if (Input.GetKeyDown(KeyCode.Alpha0))
         {
-            int x = Random.Range(0, Width);
-            int y = Random.Range(0, Height);
-            startHex = hexagons[x, y];
-            attempts++;
-            
-            if (attempts >= maxAttempts)
-            {
-                UnityEngine.Debug.LogWarning("Could not find unoccupied hexagon for new tectonic plate. All hexagons may be occupied.");
-                return;
-            }
-        } while (startHex.BelongsToPlate != '\0');
+            toggleOverlay("None");
+        }
 
-        TectonicPlate plate = new TectonicPlate
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            PlateDirection = 30 * Random.Range(1, 7),
-            PlateIntensity = Random.Range(25, 101),
-            PlateMaxSize = Random.Range(MinHexagonsPerPlate, MinHexagonsPerPlate * 3),
-            PlateID = (char)('A' + tectonicPlates.Count)
-        };
-        tectonicPlates.Add(plate);
+            toggleOverlay("Magma");
+        }
 
-        List<Hexagon> toProcess = new List<Hexagon> { startHex };
-        int size = 0;
-
-        while (toProcess.Count > 0 && size < plate.PlateMaxSize)
+        if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            Hexagon hex = toProcess[Random.Range(0, toProcess.Count)];
-            toProcess.Remove(hex);
+            toggleOverlay("Altitude");
+        }
 
-            hex.BelongsToPlate = plate.PlateID;
-            hex.MagmaDirection = plate.PlateDirection;
-            hex.MagmaIntensity = plate.PlateIntensity;
-            hex.SpriteRenderer.color = colours.GetPlateColour(plate.PlateID);
-            size++;
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            toggleOverlay("Weather");
+        }
 
-            foreach (Hexagon neighbour in hex.Neighbours)
-            {
-                if (neighbour != null && neighbour.BelongsToPlate == '\0' && Random.value < 0.5f)
-                {
-                    toProcess.Add(neighbour);
-                }
-            }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            toggleOverlay("Temperature");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            toggleOverlay("HumanComfort");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            toggleOverlay("Settlement");
         }
     }
 
+    private void Awake()
+    {
+        // Check if BiomeLoader is not null
+        if (biomeLoader == null)
+        {
+            UnityEngine.Debug.LogError("BiomeLoader is not set. Please assign it in the Unity editor.");
+            return;
+        }
+
+        // Now you can access the biomes loaded in BiomeLoader
+        biomes = biomeLoader.Biomes;
+
+        // Check if biomes are not null
+        if (biomes == null)
+        {
+            UnityEngine.Debug.LogError("Biomes not loaded in BiomeLoader.");
+            return;
+        }
+
+        // Output the number of loaded biomes
+        UnityEngine.Debug.Log("Number of loaded biomes: " + biomes.Count);
+    }
+
+    void toggleOverlay(string Overlay)
+    {
+        if (GameSettings.ActiveOverlay != Overlay)
+        {
+            GameSettings.ActiveOverlay = Overlay;
+        }
+        else if (GameSettings.ActiveOverlay == Overlay)
+        {
+            GameSettings.ActiveOverlay = "None";
+        }
+        UnityEngine.Debug.Log("Active Overlay: " + GameSettings.ActiveOverlay);
+        GeoPhase phase = new GeoPhase(this, biomes);
+        phase.ExecuteRefreshHexDisplay();
+    }
+
+    void AddHumanPopulation()
+    {
+        List<Hexagon> eligibleHexagons = this.GetHexagons()
+            .OfType<Hexagon>()
+            .Where(hex => hex.HumanComfortIndex >= 90 && hex.AltitudeVsSeaLevel > 100)
+            .ToList();
+
+        List<Hexagon> centersOfPopulation = new List<Hexagon>();
+
+        // Randomly shuffle the eligible hexagons
+        System.Random rng = new System.Random();
+        int n = eligibleHexagons.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            Hexagon value = eligibleHexagons[k];
+            eligibleHexagons[k] = eligibleHexagons[n];
+            eligibleHexagons[n] = value;
+        }
+
+        foreach (Hexagon hex in eligibleHexagons)
+        {
+            if (centersOfPopulation.Count == 5)
+            {
+                break;
+            }
+
+            bool isFarEnough = true;
+            foreach (Hexagon center in centersOfPopulation)
+            {
+                if (HexDistance(hex, center) < 6)
+                {
+                    isFarEnough = false;
+                    break;
+                }
+            }
+
+            if (isFarEnough)
+            {
+                hex.HumanPopulation = 50; // Set the population of the hex to 50
+
+                // Assign the hex to a Civilisation
+                hex.Civilisation = Civilisation.civilisations[centersOfPopulation.Count];
+
+                centersOfPopulation.Add(hex);
+            }
+        }
+
+    }
+
+    int HexDistance(Hexagon a, Hexagon b)
+    {
+        // Convert offset coordinates to cube coordinates
+        int ax = a.PositionX - (a.PositionY - (a.PositionY & 1)) / 2;
+        int az = a.PositionY;
+        int ay = -ax - az;
+
+        int bx = b.PositionX - (b.PositionY - (b.PositionY & 1)) / 2;
+        int bz = b.PositionY;
+        int by = -bx - bz;
+
+        // Calculate the distance between the two hexes
+        return (Mathf.Abs(ax - bx) + Mathf.Abs(ay - by) + Mathf.Abs(az - bz)) / 2;
+    }
+
+    public void GeneratePlateAtHexagon(Hexagon hex)
+    {
+        TectonicPlateGenerator generator = new TectonicPlateGenerator();
+        generator.GenerateTectonicPlate(hexagons, Width, Height, tectonicPlates, MinHexagonsPerPlate, hex);
+    }
+
+    public void RefreshDisplay(bool DisplayOnly = true)
+    {
+        GeoPhase phase = new GeoPhase(this, biomes);
+        if (!DisplayOnly)
+        {
+            phase.ExecuteMagmaImpact();
+            phase.ExecuteSlump();
+            phase.ExecuteWindEffect();
+            phase.ExecuteRiverFlow();
+            phase.ExecuteHumanComfortAssessment();
+            phase.ExecutePopulationGrowth();
+            phase.ExecuteSetBiomes();
+        }
+
+        phase.ExecuteRefreshHexDisplay();
+    }
 
 }

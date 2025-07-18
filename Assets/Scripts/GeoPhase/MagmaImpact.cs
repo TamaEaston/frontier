@@ -11,32 +11,40 @@ public class MagmaImpact
 
     public void Execute()
     {
-        Debug.Log("MagmaImpact has been triggered");
+        // Debug.Log("MagmaImpact has been triggered");
 
         for (int i = 0; i < hexGrid.GetHexagons().GetLength(0); i++)
         {
             for (int j = 0; j < hexGrid.GetHexagons().GetLength(1); j++)
             {
                 Hexagon hex = hexGrid.GetHexagons()[i, j];
+                hex.AltitudeChange = hex.Altitude - hex.AltitudeOld;
+                hex.AltitudeOld = hex.Altitude;
 
                 // Convert MagmaDirection to an index for the Neighbours array
                 int hexDirectionRef = (int)Mathf.Round(hex.MagmaDirection / 60f) % 6;
 
-                // Determine which neighbor the MagmaDirection points towards and away from
-                Hexagon towardsNeighbor = hex.Neighbours[hexDirectionRef];
-                Hexagon awayNeighbor = hex.Neighbours[(hexDirectionRef + 3) % 6];
+                // Determine which neighbour the MagmaDirection points towards and away from
+                Hexagon towardsNeighbour = hex.Neighbours[hexDirectionRef];
+                Hexagon awayNeighbour = hex.Neighbours[(hexDirectionRef + 3) % 6];
 
-                // Adjust the Altitude of the two identified neighboring hexagons based on the MagmaIntensity
-                if (towardsNeighbor != null)
+                // Adjust the Altitude of the two identified neighbouring hexagons based on the MagmaIntensity
+                if (towardsNeighbour != null)
                 {
-                    towardsNeighbor.Altitude += hex.MagmaIntensity;
+                    towardsNeighbour.Altitude += hex.MagmaIntensity;
                 }
-                if (awayNeighbor != null)
+                if (awayNeighbour != null)
                 {
-                    awayNeighbor.Altitude -= hex.MagmaIntensity;
+                    awayNeighbour.Altitude -= hex.MagmaIntensity;
                 }
 
-                //                Debug.Log("Hexagon: " + hex + " is pointing towards " + towardsNeighbor + " and away from " + awayNeighbor + " with a MagmaIntensity of " + hex.MagmaIntensity + " and a MagmaDirection of " + hex.MagmaDirection + " degrees.");
+                //                Debug.Log("Hexagon: " + hex + " is pointing towards " + towardsNeighbour + " and away from " + awayNeighbour + " with a MagmaIntensity of " + hex.MagmaIntensity + " and a MagmaDirection of " + hex.MagmaDirection + " degrees.");
+
+                if (hex.VolcanicActivity > 0)
+                {
+                    hex.Altitude += (hex.VolcanicActivity * 10);
+                    hex.VolcanicActivity = Mathf.Max(0, hex.VolcanicActivity - 10);
+                }
             }
         }
     }

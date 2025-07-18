@@ -1,0 +1,88 @@
+{
+    "biomes": [
+        {
+            "Name": "Swamp",
+            "Image": "Tiles/swamp-color.png",
+            "Colour": "#2E7D32",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 100
+            },
+            "Temperature": {
+                "Min": 10,
+                "Max": 50
+            },
+            "Rainfall": {
+                "Min": 30,
+                "Max": 100
+            },
+            "SurfaceWater": {
+                "Min": 100,
+                "Max": 9999
+            }
+        },
+        {
+            "Name": "Sandy Desert",
+            "Image": "Tiles/sand-dunes-color.png",
+            "Colour": "#EDC9AF",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 1000
+            },
+            "Temperature": {
+                "Min": 30,
+                "Max": 99
+            },
+            "Rainfall": {
+                "Min": 0,
+                "Max": 10
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 0
+            }
+        },
+        {
+            "Name": "Boreal Forest",
+            "Image": "Tiles/forest-conifer-color-browntrunks.png",
+            "Colour": "#014421",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 1000
+            },
+            "Temperature": {
+                "Min": -5,
+                "Max": 10
+            },
+            "Rainfall": {
+                "Min": 10,
+                "Max": 50
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 100
+            }
+        },
+        {
+            "Name": "Forest",
+            "Image": "Tiles/forest-deciduous-minicluster-matched.png",
+            "Colour": "#7AAD43",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 1000
+            },
+            "Temperature": {
+                "Min": 10,
+                "Max": 30
+            },
+            "Rainfall": {
+                "Min": 10,
+                "Max": 50
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 100
+            }
+        }
+    ]
+}
