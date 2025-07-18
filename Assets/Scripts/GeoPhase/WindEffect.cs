@@ -38,7 +38,7 @@ public class WindEffect
             Hexagon westNeighbour = hex.Neighbours[directionIndex];
             Hexagon directionNeighbour = westNeighbour;
 
-            if (directionNeighbour.Altitude > seaLevel && (directionNeighbour.HeightAboveSeaLevel - hex.HeightAboveSeaLevel) > 1000f)
+            if (directionNeighbour != null && directionNeighbour.Altitude > seaLevel && (directionNeighbour.HeightAboveSeaLevel - hex.HeightAboveSeaLevel) > 1000f)
             {
                 int[] indices = { 2, 3, 4 }; // indices for South-West, West & North-West neighbours
                 Hexagon lowestNeighbour = directionNeighbour;
@@ -47,7 +47,7 @@ public class WindEffect
                 foreach (int index in indices)
                 {
                     Hexagon neighbour = hex.Neighbours[index];
-                    if (neighbour.Altitude < lowestNeighbour.Altitude)
+                    if (neighbour != null && neighbour.Altitude < lowestNeighbour.Altitude)
                     {
                         lowestNeighbour = neighbour;
                         lowestIndex = index;
@@ -65,26 +65,29 @@ public class WindEffect
 
             Hexagon windNeighbour = hex.Neighbours[directionIndex];
 
-            for (int i = 0; i < windNeighbour.WindSources.Length; i++)
+            if (windNeighbour != null)
             {
-                if (windNeighbour.WindSources[i] == null)
+                for (int i = 0; i < windNeighbour.WindSources.Length; i++)
                 {
-                    windNeighbour.WindSources[i] = hex;
-                    break;
+                    if (windNeighbour.WindSources[i] == null)
+                    {
+                        windNeighbour.WindSources[i] = hex;
+                        break;
+                    }
                 }
             }
 
             Hexagon awayNeighbour = hex.Neighbours[(directionIndex + 3) % 6];
 
             //Calculate Wind Change & TemperatureNoWind
-            if (directionNeighbour.Altitude <= seaLevel)
+            if (directionNeighbour != null && directionNeighbour.Altitude <= seaLevel)
             {
                 hex.WindChange = 2;
                 hex.TemperatureNoWind = hex.SolarIntensity;
             }
             else
             {
-                float AltitudeChange = (awayNeighbour.HeightAboveSeaLevel - hex.HeightAboveSeaLevel);
+                float AltitudeChange = (awayNeighbour != null) ? (awayNeighbour.HeightAboveSeaLevel - hex.HeightAboveSeaLevel) : 0;
                 hex.WindChange = (AltitudeChange > 0) ? (AltitudeChange / 100f) : (AltitudeChange / 50f);
                 hex.TemperatureNoWind = hex.SolarIntensity - (4 * Mathf.Pow(2, hex.HeightAboveSeaLevel / 1000f - 1));
             }
@@ -97,7 +100,7 @@ public class WindEffect
             hex.WindIntensity = 0f;
             hex.WaterVapour = 0f;
             int yStart = hex.PositionY;
-            int yLimit = (hex.PositionY + 5) % hexGrid.Width;
+            int yLimit = Math.Min(hex.PositionY + 5, hexGrid.Height - 1);
             (float windIntensity, float waterVapour) = CalculateWindIntensityAndWaterVapour(hex, yStart, yLimit, new HashSet<Hexagon>());
             hex.WindIntensity += windIntensity;
             hex.WindIntensity = Math.Max(0f, Math.Min(100f, hex.WindIntensity));

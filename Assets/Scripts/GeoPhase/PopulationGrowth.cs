@@ -63,10 +63,7 @@ public class PopulationGrowth
                     if (Mathf.Round(otherHex.HumanPopulationNew / 10) > 4)
                     {
                         // Calculate the distance between hex and otherHex
-                        float distance = Mathf.Min(
-                            Mathf.Abs(hex.PositionX - otherHex.PositionX), // Direct distance
-                            hexGrid.Width - Mathf.Abs(hex.PositionX - otherHex.PositionX) // Distance when wrapping around the map
-                        );
+                        float distance = Mathf.Abs(hex.PositionX - otherHex.PositionX);
 
                         // Check if otherHex is within ((hex.HumanPopulation / 10) - 4) hexes
                         if (distance <= ((hex.HumanPopulation / 10) - 4) && hex.HumanPopulationNew < otherHex.HumanPopulation)

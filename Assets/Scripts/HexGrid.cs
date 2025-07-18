@@ -128,33 +128,21 @@ public class HexGrid : MonoBehaviour
             {
                 if (j % 2 == 0) // Even row
                 {
-                    hexagons[i, j].Neighbours[0] = hexagons[(i + 1) % Width, j]; // East
-                    hexagons[i, j].Neighbours[1] = j < Height - 1 ? hexagons[i, (j + 1) % Height] : null; // South-East
-                    hexagons[i, j].Neighbours[2] = j < Height - 1 ? hexagons[(i - 1 + Width) % Width, (j + 1) % Height] : null; // South-West
-                    hexagons[i, j].Neighbours[3] = hexagons[(i - 1 + Width) % Width, j]; // West
-                    hexagons[i, j].Neighbours[4] = j > 0 ? hexagons[(i - 1 + Width) % Width, (j - 1 + Height) % Height] : null; // North-West
-                    hexagons[i, j].Neighbours[5] = j > 0 ? hexagons[i, (j - 1 + Height) % Height] : null; // North-East
+                    hexagons[i, j].Neighbours[0] = i < Width - 1 ? hexagons[i + 1, j] : null; // East
+                    hexagons[i, j].Neighbours[1] = j < Height - 1 ? hexagons[i, j + 1] : null; // South-East
+                    hexagons[i, j].Neighbours[2] = j < Height - 1 && i > 0 ? hexagons[i - 1, j + 1] : null; // South-West
+                    hexagons[i, j].Neighbours[3] = i > 0 ? hexagons[i - 1, j] : null; // West
+                    hexagons[i, j].Neighbours[4] = j > 0 && i > 0 ? hexagons[i - 1, j - 1] : null; // North-West
+                    hexagons[i, j].Neighbours[5] = j > 0 ? hexagons[i, j - 1] : null; // North-East
                 }
                 else // Odd row
                 {
-                    hexagons[i, j].Neighbours[0] = hexagons[(i + 1) % Width, j]; // East
-                    hexagons[i, j].Neighbours[1] = j < Height - 1 ? hexagons[(i + 1) % Width, (j + 1) % Height] : null; // South-East
-                    hexagons[i, j].Neighbours[2] = j < Height - 1 ? hexagons[i, (j + 1) % Height] : null; // South-West
-                    hexagons[i, j].Neighbours[3] = hexagons[(i - 1 + Width) % Width, j]; // West
-                    hexagons[i, j].Neighbours[4] = j > 0 ? hexagons[i, (j - 1 + Height) % Height] : null; // North-West
-                    hexagons[i, j].Neighbours[5] = j > 0 ? hexagons[(i + 1) % Width, (j - 1 + Height) % Height] : null; // North-East
-                }
-                // North-West and North-East neighbours for top row
-                if (j == 0)
-                {
-                    hexagons[i, j].Neighbours[4] = hexagons[Width / 2, 0]; // North-West (240 degrees / 60 = 4)
-                    hexagons[i, j].Neighbours[5] = hexagons[Width / 2, 0]; // North-East (300 degrees / 60 = 5)
-                }
-                else if (j == Height - 1)
-                // South-East and South-West neighbours for bottom row
-                {
-                    hexagons[i, j].Neighbours[1] = hexagons[Width / 2, Height - 1]; // South-East (60 degrees / 60 = 1)
-                    hexagons[i, j].Neighbours[2] = hexagons[Width / 2, Height - 1]; // South-West (120 degrees / 60 = 2)
+                    hexagons[i, j].Neighbours[0] = i < Width - 1 ? hexagons[i + 1, j] : null; // East
+                    hexagons[i, j].Neighbours[1] = j < Height - 1 && i < Width - 1 ? hexagons[i + 1, j + 1] : null; // South-East
+                    hexagons[i, j].Neighbours[2] = j < Height - 1 ? hexagons[i, j + 1] : null; // South-West
+                    hexagons[i, j].Neighbours[3] = i > 0 ? hexagons[i - 1, j] : null; // West
+                    hexagons[i, j].Neighbours[4] = j > 0 ? hexagons[i, j - 1] : null; // North-West
+                    hexagons[i, j].Neighbours[5] = j > 0 && i < Width - 1 ? hexagons[i + 1, j - 1] : null; // North-East
                 }
             }
         }
