@@ -14,7 +14,7 @@ This is a Unity-based geological simulation called "hexageo" that simulates tect
 - **Hexagon.cs**: Individual hexagon cell data structure containing altitude, magma properties, wind properties, and plate assignments
 - **GeoPhase/**: Geological simulation phases including:
   - `MagmaImpact.cs`: Simulates magma movement affecting altitude based on intensity and direction
-  - `Slump.cs`: Handles altitude redistribution where higher cells transfer 10% of height difference to lower neighbors
+  - `Slump.cs`: Handles altitude redistribution where higher cells transfer 2.5% of height difference to lower neighbors
   - `RefreshHexGridDisplay.cs`: Updates visual representation after geological changes
 
 ### Key Systems
@@ -55,10 +55,15 @@ This is a Unity-based geological simulation called "hexageo" that simulates tect
 - Polar regions (top/bottom rows) have special neighbor assignments to central cells
 
 ### Geological Algorithm Order
-1. **MagmaImpact**: Uses MagmaIntensity and MagmaDirection to modify AltitudeNew
-2. **Slump**: Transfers 10% of height difference from higher to lower neighbors
+1. **MagmaImpact**: Uses MagmaIntensity and MagmaDirection to modify neighbor altitudes directionally. Also handles volcanic activity which adds altitude and decays over time.
+2. **Slump**: Transfers 2.5% of height difference from higher to lower neighbors, processing hexagons from highest to lowest altitude
 3. **RefreshHexGridDisplay**: Updates visual colors based on height above sea level
 
 ### Plate Generation
 - Plates grow from random seed points with 50% chance for neighbors to join
 - Each plate has unique direction (30°, 60°, 90°, 120°, 150°, 180°), intensity (25-100), and size limits
+
+### Magma System
+- Direction converted to neighbor index (0-5) using 60-degree increments
+- Magma flows toward one neighbor (+intensity) and away from opposite neighbor (-intensity)
+- Volcanic activity provides additional altitude boost and naturally decays
