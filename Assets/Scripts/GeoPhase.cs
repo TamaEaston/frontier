@@ -70,6 +70,11 @@ public class GeoPhase
         setBiomes.Execute();
     }
 
+    public void ExecuteEdgeGuard()
+    {
+        EdgeGuard edgeGuard = new EdgeGuard(hexGrid);
+        edgeGuard.Execute();
+    }
 
     public void ExecuteRefreshHexDisplay()
     {

@@ -99,7 +99,7 @@ public class HexGrid : MonoBehaviour
                 hex.PositionY = j;
 
                 // Continental terrain generation will be done after grid creation
-                hex.Altitude = 7500; // Temporary deep ocean level
+                hex.Altitude = 9500; // Temporary deep ocean level
                 hex.AltitudeOld = hex.Altitude;
 
                 // Assign magma intensity & direction as East
@@ -211,6 +211,7 @@ public class HexGrid : MonoBehaviour
                 phase.ExecuteHumanComfortAssessment();
                 phase.ExecutePopulationGrowth();
                 phase.ExecuteSetBiomes();
+                phase.ExecuteEdgeGuard();
                 
                 // Only refresh display on the final cycle for performance
                 if (cycle == 9)
@@ -382,6 +383,7 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteHumanComfortAssessment();
             phase.ExecutePopulationGrowth();
             phase.ExecuteSetBiomes();
+            phase.ExecuteEdgeGuard();
         }
 
         phase.ExecuteRefreshHexDisplay();
@@ -389,35 +391,35 @@ public class HexGrid : MonoBehaviour
 
     private void GenerateContinentalTerrain()
     {
-        // Continental terrain generation with 5-zone smooth interpolation
+        // Improved continental terrain generation with guaranteed ocean buffers
         // Sea level = 10000m, Ocean = 7500m (-2500m relative to sea level)
         
-        // 1. Define angled geographic features (West to East)
+        // 1. Define angled geographic features with improved layout
         
-        // Western Coastline (5-15% of width)
-        float westernCoastNorthX = Random.Range(Width * 0.05f, Width * 0.15f);
-        float westernCoastSouthX = Random.Range(Width * 0.05f, Width * 0.15f);
-        float westernCoastAltitude = Random.Range(8000f, 10000f); // Around sea level
+        // Western Coastline (3-8% of width - closer to edge)
+        float westernCoastNorthX = Random.Range(Width * 0.03f, Width * 0.08f);
+        float westernCoastSouthX = Random.Range(Width * 0.03f, Width * 0.08f);
+        float westernCoastAltitude = Random.Range(10500f, 11000f); // Just above sea level
         
-        // Western Mountains (20-40% of width)
-        float westernMountainsNorthX = Random.Range(Width * 0.20f, Width * 0.40f);
-        float westernMountainsSouthX = Random.Range(Width * 0.20f, Width * 0.40f);
+        // Western Mountains (15-35% of width)
+        float westernMountainsNorthX = Random.Range(Width * 0.15f, Width * 0.35f);
+        float westernMountainsSouthX = Random.Range(Width * 0.15f, Width * 0.35f);
         float westernMountainsAltitude = Random.Range(14000f, 18000f); // High peaks
         
-        // Eastern Mountains (60-80% of width)
-        float easternMountainsNorthX = Random.Range(Width * 0.60f, Width * 0.80f);
-        float easternMountainsSouthX = Random.Range(Width * 0.60f, Width * 0.80f);
+        // Eastern Mountains (65-85% of width)
+        float easternMountainsNorthX = Random.Range(Width * 0.65f, Width * 0.85f);
+        float easternMountainsSouthX = Random.Range(Width * 0.65f, Width * 0.85f);
         float easternMountainsAltitude = Random.Range(14000f, 18000f); // High peaks
         
-        // Interior Valley (midpoint between mountain ranges)
+        // Interior Valley (midpoint between mountain ranges - RAISED to prevent inland seas)
         float interiorValleyNorthX = (westernMountainsNorthX + easternMountainsNorthX) / 2f;
         float interiorValleySouthX = (westernMountainsSouthX + easternMountainsSouthX) / 2f;
-        float interiorValleyAltitude = Random.Range(11000f, 13000f); // Above sea level but lower
+        float interiorValleyAltitude = Random.Range(13000f, 16000f); // RAISED - well above sea level
         
-        // Eastern Coastline (85-95% of width)
-        float easternCoastNorthX = Random.Range(Width * 0.85f, Width * 0.95f);
-        float easternCoastSouthX = Random.Range(Width * 0.85f, Width * 0.95f);
-        float easternCoastAltitude = Random.Range(8000f, 10000f); // Around sea level
+        // Eastern Coastline (92-97% of width - closer to edge)
+        float easternCoastNorthX = Random.Range(Width * 0.92f, Width * 0.97f);
+        float easternCoastSouthX = Random.Range(Width * 0.92f, Width * 0.97f);
+        float easternCoastAltitude = Random.Range(10500f, 11000f); // Just above sea level
         
         // 2. Smooth horizontal interpolation across the continent
         for (int i = 0; i < Width; i++)
@@ -477,8 +479,14 @@ public class HexGrid : MonoBehaviour
                     finalAltitude = Mathf.Lerp(easternCoastAltitude, 7500f, t);
                 }
                 
+                // Enforce minimum continental altitude (prevent inland seas)
+                if (x > westernCoastX && x < easternCoastX)
+                {
+                    finalAltitude = Mathf.Max(finalAltitude, 10500f); // Minimum continental altitude
+                }
+                
                 // Add minimal noise for natural variation
-                finalAltitude += Random.Range(-50f, 50f);
+                finalAltitude += Random.Range(-25f, 25f); // Reduced noise
                 
                 hex.Altitude = finalAltitude;
                 hex.AltitudeOld = hex.Altitude;

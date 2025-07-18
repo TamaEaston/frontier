@@ -12,12 +12,15 @@ public class SeaLevel
 
     public void Execute()
     {
-        var allHexagons = hexGrid.GetHexagons()
-            .Cast<Hexagon>()
-            .ToList();
-        float averageAltitude = allHexagons.Average(hex => hex.Altitude);
+        // Fixed sea level for Frontier continental system
+        // Sea level is always maintained at 10000m for consistent continental boundaries
+        hexGrid.SeaLevel = 10000f;
 
-        hexGrid.SeaLevel = averageAltitude + (hexGrid.SeaPerHex + hexGrid.AverageGlobalTemperature * 10);
-
+        // Note: Original dynamic calculation disabled for Frontier
+        // var allHexagons = hexGrid.GetHexagons()
+        //     .Cast<Hexagon>()
+        //     .ToList();
+        // float averageAltitude = allHexagons.Average(hex => hex.Altitude);
+        // hexGrid.SeaLevel = averageAltitude + (hexGrid.SeaPerHex + hexGrid.AverageGlobalTemperature * 10);
     }
 }
