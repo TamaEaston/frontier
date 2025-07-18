@@ -98,8 +98,8 @@ public class HexGrid : MonoBehaviour
                 hex.PositionX = i;
                 hex.PositionY = j;
 
-                // Assign a random altitude
-                hex.Altitude = Random.Range(9000, 11000);
+                // Continental terrain generation will be done after grid creation
+                hex.Altitude = 7500; // Temporary deep ocean level
                 hex.AltitudeOld = hex.Altitude;
 
                 // Assign magma intensity & direction as East
@@ -120,6 +120,9 @@ public class HexGrid : MonoBehaviour
                 settlements[i, j] = settlement;
             }
         }
+
+        // Generate Continental Terrain
+        GenerateContinentalTerrain();
 
         // Set Neighbours...
         for (int i = 0; i < Width; i++)
@@ -372,6 +375,110 @@ public class HexGrid : MonoBehaviour
         }
 
         phase.ExecuteRefreshHexDisplay();
+    }
+
+    private void GenerateContinentalTerrain()
+    {
+        // Continental terrain generation for Frontier
+        // Sea level is 10000m, deep ocean is 7500m, mountains are 14000-18000m
+        
+        // 1. Generate Western Mountain Range
+        float westernNorthX = Random.Range(Width * 0.1f, Width * 0.4f);
+        float westernSouthX = Random.Range(Width * 0.1f, Width * 0.4f);
+        float westernAltitude = Random.Range(14000f, 18000f);
+        
+        // 2. Generate Eastern Mountain Range
+        float easternNorthX = Random.Range(Width * 0.6f, Width * 0.9f);
+        float easternSouthX = Random.Range(Width * 0.6f, Width * 0.9f);
+        float easternAltitude = Random.Range(14000f, 18000f);
+        
+        // 3. Generate Inland Valley Point
+        float valleyNorthX = (easternNorthX + westernNorthX) / 2f;
+        float valleySouthX = (easternSouthX + westernSouthX) / 2f;
+        float valleyAltitude = Random.Range(11000f, 13000f);
+        
+        // 4. Assign altitudes based on distance to features
+        for (int i = 0; i < Width; i++)
+        {
+            for (int j = 0; j < Height; j++)
+            {
+                Hexagon hex = hexagons[i, j];
+                float x = (float)i;
+                float y = (float)j;
+                
+                // Calculate position along north-south axis (0 = north, 1 = south)
+                float northSouthRatio = (float)j / (Height - 1);
+                
+                // Interpolate mountain range X positions based on north-south position
+                float westernX = Mathf.Lerp(westernNorthX, westernSouthX, northSouthRatio);
+                float easternX = Mathf.Lerp(easternNorthX, easternSouthX, northSouthRatio);
+                float valleyX = Mathf.Lerp(valleyNorthX, valleySouthX, northSouthRatio);
+                
+                // Calculate distances to key features
+                float distToWestern = Mathf.Abs(x - westernX);
+                float distToEastern = Mathf.Abs(x - easternX);
+                float distToValley = Mathf.Abs(x - valleyX);
+                float distToWestEdge = x; // Distance from west edge (x=0)
+                float distToEastEdge = (Width - 1) - x; // Distance from east edge
+                
+                // Find the closest feature and calculate altitude
+                float targetAltitude;
+                float blendDistance;
+                
+                // Determine primary feature based on closest distance
+                if (distToWestEdge < Width * 0.05f) // Very close to west edge - ocean
+                {
+                    targetAltitude = 7500f; // Deep ocean
+                    blendDistance = distToWestEdge;
+                }
+                else if (distToEastEdge < Width * 0.05f) // Very close to east edge - ocean
+                {
+                    targetAltitude = 7500f; // Deep ocean
+                    blendDistance = distToEastEdge;
+                }
+                else if (distToWestern < distToEastern && distToWestern < distToValley)
+                {
+                    // Closest to western mountain range
+                    targetAltitude = westernAltitude;
+                    blendDistance = distToWestern;
+                }
+                else if (distToEastern < distToWestern && distToEastern < distToValley)
+                {
+                    // Closest to eastern mountain range
+                    targetAltitude = easternAltitude;
+                    blendDistance = distToEastern;
+                }
+                else
+                {
+                    // Closest to valley
+                    targetAltitude = valleyAltitude;
+                    blendDistance = distToValley;
+                }
+                
+                // Calculate blend factor (closer = more influence)
+                float maxBlendDistance = Width * 0.3f; // Maximum distance for blending
+                float blendFactor = Mathf.Clamp01(1f - (blendDistance / maxBlendDistance));
+                
+                // Blend between target altitude and sea level base
+                float baseAltitude = 10000f; // Sea level as baseline
+                float finalAltitude = Mathf.Lerp(baseAltitude, targetAltitude, blendFactor);
+                
+                // Add some noise for natural variation
+                finalAltitude += Random.Range(-200f, 200f);
+                
+                // Ensure deep ocean at edges
+                if (distToWestEdge < Width * 0.1f || distToEastEdge < Width * 0.1f)
+                {
+                    float edgeBlend = Mathf.Min(distToWestEdge, distToEastEdge) / (Width * 0.1f);
+                    finalAltitude = Mathf.Lerp(7500f, finalAltitude, edgeBlend);
+                }
+                
+                hex.Altitude = finalAltitude;
+                hex.AltitudeOld = hex.Altitude;
+            }
+        }
+        
+        UnityEngine.Debug.Log($"Continental terrain generated: Western range at {westernNorthX:F1}-{westernSouthX:F1}, Eastern range at {easternNorthX:F1}-{easternSouthX:F1}, Valley at {valleyNorthX:F1}-{valleySouthX:F1}");
     }
 
 }
