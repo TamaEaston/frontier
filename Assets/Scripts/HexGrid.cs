@@ -138,11 +138,21 @@ public class HexGrid : MonoBehaviour
     void GenerateTectonicPlate()
     {
         Hexagon startHex = null;
+        int attempts = 0;
+        int maxAttempts = Width * Height;
+        
         do
         {
             int x = Random.Range(0, Width);
             int y = Random.Range(0, Height);
             startHex = hexagons[x, y];
+            attempts++;
+            
+            if (attempts >= maxAttempts)
+            {
+                UnityEngine.Debug.LogWarning("Could not find unoccupied hexagon for new tectonic plate. All hexagons may be occupied.");
+                return;
+            }
         } while (startHex.BelongsToPlate != '\0');
 
         TectonicPlate plate = new TectonicPlate
