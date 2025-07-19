@@ -167,6 +167,7 @@ public class HexGrid : MonoBehaviour
         int NumberOfGeoPhases = 25;
         for (int i = 0; i < NumberOfGeoPhases; i++)
         {
+            Era += 1; // Count initial generation cycles
             phase.ExecuteMagmaImpact();
             phase.ExecuteSlump();
             phase.ExecuteSeaLevel();

@@ -44,6 +44,10 @@ public class SetBiomes
 
         foreach (var hex in allHexagons)
         {
+            // Clear existing biome assignment
+            hex.Biome = null;
+            
+            // Find matching biome
             foreach (var biome in biomes)
             {
                 if (biome.HeightAboveSeaLevel.Min <= hex.HeightAboveSeaLevel &&

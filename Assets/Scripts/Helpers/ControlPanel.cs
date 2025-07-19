@@ -17,10 +17,30 @@ public class ControlPanel : MonoBehaviour
 
     void Update()
     {
-        if (populationText != null)
+        if (populationText != null && hexGrid != null)
         {
             string activeView = GameSettings.ActiveOverlay == "None" ? "Biome" : GameSettings.ActiveOverlay;
-            populationText.text = "View: " + activeView + " | Era: " + hexGrid.Era * 10 + " AG";
+            
+            // Calculate average height above sea level
+            float totalHeight = 0f;
+            int hexCount = 0;
+            var hexagons = hexGrid.GetHexagons();
+            
+            for (int i = 0; i < hexagons.GetLength(0); i++)
+            {
+                for (int j = 0; j < hexagons.GetLength(1); j++)
+                {
+                    if (hexagons[i, j] != null)
+                    {
+                        totalHeight += hexagons[i, j].HeightAboveSeaLevel;
+                        hexCount++;
+                    }
+                }
+            }
+            
+            float averageHeight = hexCount > 0 ? totalHeight / hexCount : 0f;
+            
+            populationText.text = activeView + " | Era " + hexGrid.Era + " | Height " + averageHeight.ToString("F0") + "m";
         }
 
     }
