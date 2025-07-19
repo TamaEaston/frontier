@@ -96,12 +96,22 @@ public class OverlayRenderer
         /// <param name="hexagon">The hexagon to render for</param>
         public void RenderWindArrow(Hexagon hexagon)
         {
-            if (hexagon == null) return;
+            if (hexagon == null || hexGrid?.GetArrows() == null) return;
             
+            Arrow arrow = hexGrid.GetArrows()[hexagon.PositionX, hexagon.PositionY];
+            if (arrow == null) return;
+            
+            // Set rotation based on wind direction
+            arrow.transform.rotation = Quaternion.Euler(0, 0, hexagon.WindDirection);
+            
+            // Use fixed transparency like original (not intensity-based)
             Color windColor = Color.white;
             windColor.a = 0.25f;
+            arrow.SpriteRenderer.color = windColor;
             
-            RenderDirectionalArrow(hexagon, hexagon.WindDirection, hexagon.WindIntensity, windColor, 0.5f);
+            // Set scale based on intensity (same as original)
+            float scale = Mathf.Min(0.5f, hexagon.WindIntensity / 200f);
+            arrow.transform.localScale = new Vector3(scale, scale, 1f);
         }
         
         /// <summary>

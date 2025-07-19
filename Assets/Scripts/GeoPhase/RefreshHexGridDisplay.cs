@@ -103,8 +103,9 @@ public class RefreshHexGridDisplay
                 hex.SpriteRenderer.color = altitudeColour;
 
                 //River Lines
-                if (hex.LowestNeighbour != null && hex.AltitudeVsSeaLevel > 0)
+                if (hex.RiverWidth > 0 && hex.LowestNeighbour != null && hex.AltitudeVsSeaLevel > 0)
                 {
+                    Debug.Log($"Creating river: RiverWidth={hex.RiverWidth}, AltitudeVsSeaLevel={hex.AltitudeVsSeaLevel}, Position=({i},{j})");
                     Color riverColour = (hex.Temperature < -5) ? new Color(0.6f, 0.8f, 1.0f) : new Color(0.0f, 0.5f, 0.5f);
 
                     Vector3 startPos = new Vector3(hex.transform.position.x, hex.transform.position.y, -1);
@@ -129,6 +130,7 @@ public class RefreshHexGridDisplay
                     line1.startWidth = riverWidth;
                     line1.endWidth = riverWidth;
                     line1.material = new Material(Shader.Find("Unlit/Color")) { color = riverColour };
+                    line1.sortingOrder = 1; // Render in front of hexagons
                     line1.SetPosition(0, startPos);
                     line1.SetPosition(1, edgePos1);
                     line1.tag = "RiverLine";
@@ -141,6 +143,7 @@ public class RefreshHexGridDisplay
                         line2.startWidth = riverWidth;
                         line2.endWidth = riverWidth;
                         line2.material = new Material(Shader.Find("Unlit/Color")) { color = riverColour };
+                        line2.sortingOrder = 1; // Render in front of hexagons
                         line2.SetPosition(0, endPos);
                         line2.SetPosition(1, edgePos2);
                         line2.tag = "RiverLine";

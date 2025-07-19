@@ -91,6 +91,12 @@ public class ViewManager
         {
             if (currentView == null || hexGrid?.GetHexagons() == null) return;
             
+            // Clear all existing river lines
+            foreach (GameObject line in GameObject.FindGameObjectsWithTag("RiverLine"))
+            {
+                GameObject.Destroy(line);
+            }
+            
             var hexagons = hexGrid.GetHexagons();
             int mapWidth = hexagons.GetLength(0);
             int mapHeight = hexagons.GetLength(1);
