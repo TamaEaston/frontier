@@ -22,26 +22,32 @@ public class ControlPanel : MonoBehaviour
         {
             string activeView = GameSettings.ActiveOverlay == "None" ? "Biome" : GameSettings.ActiveOverlay;
             
-            // Calculate average height above sea level
+            // Calculate averages for land hexes only
             float totalHeight = 0f;
-            int hexCount = 0;
+            float totalRainfall = 0f;
+            float totalTemperature = 0f;
+            int landHexCount = 0;
             var hexagons = hexGrid.GetHexagons();
             
             for (int i = 0; i < hexagons.GetLength(0); i++)
             {
                 for (int j = 0; j < hexagons.GetLength(1); j++)
                 {
-                    if (hexagons[i, j] != null)
+                    if (hexagons[i, j] != null && hexagons[i, j].AltitudeVsSeaLevel > 0) // Land only
                     {
                         totalHeight += hexagons[i, j].HeightAboveSeaLevel;
-                        hexCount++;
+                        totalRainfall += hexagons[i, j].Rainfall;
+                        totalTemperature += hexagons[i, j].Temperature;
+                        landHexCount++;
                     }
                 }
             }
             
-            float averageHeight = hexCount > 0 ? totalHeight / hexCount : 0f;
+            float averageHeight = landHexCount > 0 ? totalHeight / landHexCount : 0f;
+            float averageRainfall = landHexCount > 0 ? totalRainfall / landHexCount : 0f;
+            float averageTemperature = landHexCount > 0 ? totalTemperature / landHexCount : 0f;
             
-            infoPanel.text = activeView + " | Era " + hexGrid.Era + " | Height " + averageHeight.ToString("F0") + "m";
+            infoPanel.text = activeView + " | Era " + hexGrid.Era + " | Height " + averageHeight.ToString("F0") + "m | Rainfall " + averageRainfall.ToString("F0") + " | Temp " + averageTemperature.ToString("F0") + "°C";
         }
 
     }

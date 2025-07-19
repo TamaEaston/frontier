@@ -137,11 +137,32 @@ public class WindEffect
             hex.WaterVapour += waterVapour;
             hex.WaterVapour = Math.Max(0f, Math.Min(100f, hex.WaterVapour));
             
-            // Ensure eastern ocean edge maintains maximum values
+            // Eastern ocean edge with temperature-based moisture gradient
             if (hex.Altitude <= seaLevel && hex.PositionX >= hexGrid.Width - 3) 
             {
                 hex.WindIntensity = Math.Max(hex.WindIntensity, 100f); // Ensure minimum 100
-                hex.WaterVapour = Math.Max(hex.WaterVapour, 100f);     // Ensure minimum 100
+                
+                // Base evaporation boost for eastern ocean
+                hex.Evaporation = 60f;
+                
+                // Calculate WaterVapour based on hex temperature (reflects Arctic/Desert zones)
+                float temperature = hex.Temperature; // Use existing temperature calculation
+                
+                if (temperature < 5f) // Arctic conditions
+                {
+                    hex.WaterVapour = 20f + (temperature + 15f) * 1.5f; // 0-50 range, smoothly increasing
+                }
+                else if (temperature > 25f) // Desert conditions  
+                {
+                    hex.WaterVapour = Math.Max(0f, 60f - (temperature - 25f) * 2.4f); // 60-0 range, decreasing to 0 at 50°C
+                }
+                else // Temperate zone (5-25°C)
+                {
+                    hex.WaterVapour = 60f + 40f * Mathf.Sin((temperature - 5f) / 20f * Mathf.PI); // 60-100 range, peaked around 15°C
+                }
+                
+                // Ensure bounds
+                hex.WaterVapour = Mathf.Clamp(hex.WaterVapour, 0f, 100f);
             }
         }
 

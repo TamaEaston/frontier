@@ -9,11 +9,8 @@ public class ClimateTemperature
     public ClimateTemperature(HexGrid hexGrid)
     {
         this.hexGrid = hexGrid;
-        // Deterministically assign arctic boundary based on map dimensions
-        // This ensures consistency across multiple runs for the same map
-        int seed = hexGrid.Width * 1000 + hexGrid.Height;
-        UnityEngine.Random.InitState(seed);
-        isNorthArctic = UnityEngine.Random.value > 0.5f;
+        // Use the fixed arctic assignment from HexGrid (set once at map generation)
+        isNorthArctic = hexGrid.IsNorthArctic;
     }
 
     public void Execute()

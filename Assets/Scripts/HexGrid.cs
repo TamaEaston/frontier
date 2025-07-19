@@ -35,6 +35,7 @@ public class HexGrid : MonoBehaviour
     public float GenesisSeaLevel = 10000;
     public float SeaPerHex = 0;
     public float AverageGlobalTemperature = 15;
+    public bool IsNorthArctic; // Fixed climate assignment for entire map lifecycle
 
     private Hexagon[,] hexagons;
     public Hexagon[,] GetHexagons()
@@ -64,6 +65,8 @@ public class HexGrid : MonoBehaviour
 
     void Start()
     {
+        // Set fixed climate assignment for entire map lifecycle (randomized once)
+        IsNorthArctic = UnityEngine.Random.value > 0.5f;
 
         NumberOfPlates = Mathf.Min(NumberOfPlates, 24); // Apply the restriction
         hexagons = new Hexagon[Width, Height];
@@ -202,8 +205,8 @@ public class HexGrid : MonoBehaviour
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
             
-            // Run 10 geological cycles per Space press
-            for (int cycle = 0; cycle < 10; cycle++)
+            // Run 5 geological cycles per Space press
+            for (int cycle = 0; cycle < 5; cycle++)
             {
                 Era += 1;
                 GeoPhase phase = new GeoPhase(this, biomes);
@@ -231,7 +234,14 @@ public class HexGrid : MonoBehaviour
             }
 
             stopwatch.Stop();
-            UnityEngine.Debug.Log($"10 geological cycles completed in {stopwatch.ElapsedMilliseconds} ms (Era {Era})");
+            UnityEngine.Debug.Log($"5 geological cycles completed in {stopwatch.ElapsedMilliseconds} ms (Era {Era})");
+        }
+
+        // Regenerate map when R is pressed
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            UnityEngine.Debug.Log("Regenerating map...");
+            RegenerateMap();
         }
 
         //Toggle Views using ViewManager
@@ -523,6 +533,67 @@ public class HexGrid : MonoBehaviour
         }
         
         UnityEngine.Debug.Log($"Realistic continental terrain generated: WCoast({westernCoastBaseNorthX:F0}-{westernCoastBaseSouthX:F0}) WPlains({westernPlainsNorthX:F0}-{westernPlainsSouthX:F0}) WMtns({westernMountainsNorthX:F0}-{westernMountainsSouthX:F0}) CPlains({centralPlainsNorthX:F0}-{centralPlainsSouthX:F0}) EMtns({easternMountainsNorthX:F0}-{easternMountainsSouthX:F0}) EPlains({easternPlainsNorthX:F0}-{easternPlainsSouthX:F0}) ECoast({easternCoastBaseNorthX:F0}-{easternCoastBaseSouthX:F0})");
+    }
+
+    /// <summary>
+    /// Regenerate the entire map with new climate assignment and terrain
+    /// </summary>
+    private void RegenerateMap()
+    {
+        // Reset Era to 0
+        Era = 0;
+        
+        // Set new random climate assignment
+        IsNorthArctic = UnityEngine.Random.value > 0.5f;
+        
+        // Regenerate continental terrain
+        GenerateContinentalTerrain();
+        
+        // Apply EdgeGuard to ensure ocean boundaries
+        GeoPhase edgePhase = new GeoPhase(this, biomes);
+        edgePhase.ExecuteEdgeGuard();
+        
+        // Generate new tectonic plates
+        tectonicPlates.Clear();
+        for (int i = 0; i < NumberOfPlates; i++)
+        {
+            TectonicPlateGenerator generator = new TectonicPlateGenerator();
+            generator.GenerateTectonicPlate(hexagons, Width, Height, tectonicPlates, MinHexagonsPerPlate, null);
+        }
+        
+        // Run initial geological phases like in Start()
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch.Start();
+        GeoPhase phase = new GeoPhase(this, biomes);
+        int NumberOfGeoPhases = 25;
+        for (int i = 0; i < NumberOfGeoPhases; i++)
+        {
+            Era += 1; // Count initial generation cycles
+            phase.ExecuteClimateTemperature();
+            phase.ExecuteMagmaImpact();
+            phase.ExecuteSlump();
+            phase.ExecuteSeaLevel();
+            phase.ExecuteWindEffect();
+            phase.ExecuteRiverFlow();
+        }
+        stopwatch.Stop();
+        UnityEngine.Debug.Log($"Map regenerated with {NumberOfGeoPhases} initial cycles in {stopwatch.ElapsedMilliseconds} ms");
+        
+        // Set biomes and refresh display
+        GenesisSeaLevel = SeaLevel;
+        phase.ExecuteSetBiomes();
+        
+        // Refresh the view
+        if (viewManager != null)
+        {
+            viewManager.RefreshDisplay();
+        }
+        else
+        {
+            phase.ExecuteRefreshHexDisplay();
+        }
+        
+        UnityEngine.Debug.Log($"New map generated! Climate: {(IsNorthArctic ? "North Arctic" : "South Arctic")}");
     }
 
 }
