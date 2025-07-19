@@ -391,109 +391,143 @@ public class HexGrid : MonoBehaviour
 
     private void GenerateContinentalTerrain()
     {
-        // Improved continental terrain generation with guaranteed ocean buffers
-        // Sea level = 10000m, Ocean = 7500m (-2500m relative to sea level)
+        // Realistic continental terrain optimized for human settlement
+        // Sea level = 10000m (fixed), Ocean = 7500m (-2500m relative to sea level)
+        // Target: 80%+ of landmass at 100-800m elevation for optimal settlement
         
-        // 1. Define angled geographic features with improved layout
+        // 1. Define 7-zone geographic layout with realistic altitudes
         
-        // Western Coastline (3-8% of width - closer to edge)
-        float westernCoastNorthX = Random.Range(Width * 0.03f, Width * 0.08f);
-        float westernCoastSouthX = Random.Range(Width * 0.03f, Width * 0.08f);
-        float westernCoastAltitude = Random.Range(10500f, 11000f); // Just above sea level
+        // Western Coast (3-8% of width) - with coastal noise
+        float westernCoastBaseNorthX = Random.Range(Width * 0.03f, Width * 0.08f);
+        float westernCoastBaseSouthX = Random.Range(Width * 0.03f, Width * 0.08f);
+        float coastalAltitude = Random.Range(10100f, 10300f); // 100-300m above sea level
         
-        // Western Mountains (15-35% of width)
-        float westernMountainsNorthX = Random.Range(Width * 0.15f, Width * 0.35f);
-        float westernMountainsSouthX = Random.Range(Width * 0.15f, Width * 0.35f);
-        float westernMountainsAltitude = Random.Range(14000f, 18000f); // High peaks
+        // Western Coastal Plains (8-20% of width) - prime agricultural land
+        float westernPlainsNorthX = Random.Range(Width * 0.08f, Width * 0.20f);
+        float westernPlainsSouthX = Random.Range(Width * 0.08f, Width * 0.20f);
+        float coastalPlainsAltitude = Random.Range(10100f, 10300f); // 100-300m above sea level
         
-        // Eastern Mountains (65-85% of width)
-        float easternMountainsNorthX = Random.Range(Width * 0.65f, Width * 0.85f);
-        float easternMountainsSouthX = Random.Range(Width * 0.65f, Width * 0.85f);
-        float easternMountainsAltitude = Random.Range(14000f, 18000f); // High peaks
+        // Western Mountains (20-30% of width) - NARROWER but dramatic
+        float westernMountainsNorthX = Random.Range(Width * 0.20f, Width * 0.30f);
+        float westernMountainsSouthX = Random.Range(Width * 0.20f, Width * 0.30f);
+        float westernMountainsAltitude = Random.Range(11000f, 14000f); // 1000-4000m above sea level
         
-        // Interior Valley (midpoint between mountain ranges - RAISED to prevent inland seas)
-        float interiorValleyNorthX = (westernMountainsNorthX + easternMountainsNorthX) / 2f;
-        float interiorValleySouthX = (westernMountainsSouthX + easternMountainsSouthX) / 2f;
-        float interiorValleyAltitude = Random.Range(10000f, 13000f); // RAISED - well above sea level
+        // Central Plains (30-70% of width) - fertile continental interior
+        float centralPlainsNorthX = (westernMountainsNorthX + Random.Range(Width * 0.70f, Width * 0.80f)) / 2f;
+        float centralPlainsSouthX = (westernMountainsSouthX + Random.Range(Width * 0.70f, Width * 0.80f)) / 2f;
+        float centralPlainsAltitude = Random.Range(10200f, 10600f); // 200-600m above sea level - OPTIMAL
         
-        // Eastern Coastline (92-97% of width - closer to edge)
-        float easternCoastNorthX = Random.Range(Width * 0.92f, Width * 0.97f);
-        float easternCoastSouthX = Random.Range(Width * 0.92f, Width * 0.97f);
-        float easternCoastAltitude = Random.Range(10500f, 11000f); // Just above sea level
+        // Eastern Mountains (70-80% of width) - NARROWER but dramatic
+        float easternMountainsNorthX = Random.Range(Width * 0.70f, Width * 0.80f);
+        float easternMountainsSouthX = Random.Range(Width * 0.70f, Width * 0.80f);
+        float easternMountainsAltitude = Random.Range(11000f, 14000f); // 1000-4000m above sea level
         
-        // 2. Smooth horizontal interpolation across the continent
+        // Eastern Coastal Plains (80-92% of width) - prime agricultural land
+        float easternPlainsNorthX = Random.Range(Width * 0.80f, Width * 0.92f);
+        float easternPlainsSouthX = Random.Range(Width * 0.80f, Width * 0.92f);
+        float easternCoastalPlainsAltitude = Random.Range(10100f, 10300f); // 100-300m above sea level
+        
+        // Eastern Coast (92-97% of width) - with coastal noise
+        float easternCoastBaseNorthX = Random.Range(Width * 0.92f, Width * 0.97f);
+        float easternCoastBaseSouthX = Random.Range(Width * 0.92f, Width * 0.97f);
+        float easternCoastalAltitude = Random.Range(10100f, 10300f); // 100-300m above sea level
+        
+        // 2. Create natural coastlines with Perlin noise and 7-zone interpolation
         for (int i = 0; i < Width; i++)
         {
             for (int j = 0; j < Height; j++)
             {
                 Hexagon hex = hexagons[i, j];
-                float x = (float)i;
+                float x = i;
                 
                 // Calculate position along north-south axis (0 = north, 1 = south)
                 float northSouthRatio = (float)j / (Height - 1);
                 
-                // Interpolate feature X positions based on north-south position
-                float westernCoastX = Mathf.Lerp(westernCoastNorthX, westernCoastSouthX, northSouthRatio);
+                // Apply coastal noise for natural bays and inlets
+                float largeBayNoise = Mathf.PerlinNoise(j * 0.1f, 0) * 0.05f * Width; // Large bays
+                float smallInletNoise = Mathf.PerlinNoise(j * 0.3f, 1000) * 0.02f * Width; // Small inlets
+                float coastalNoise = largeBayNoise + smallInletNoise;
+                
+                // Interpolate geographic zones with coastal noise
+                float westernCoastX = Mathf.Lerp(westernCoastBaseNorthX, westernCoastBaseSouthX, northSouthRatio) + coastalNoise;
+                float westernPlainsX = Mathf.Lerp(westernPlainsNorthX, westernPlainsSouthX, northSouthRatio);
                 float westernMountainsX = Mathf.Lerp(westernMountainsNorthX, westernMountainsSouthX, northSouthRatio);
-                float interiorValleyX = Mathf.Lerp(interiorValleyNorthX, interiorValleySouthX, northSouthRatio);
+                float centralPlainsX = Mathf.Lerp(centralPlainsNorthX, centralPlainsSouthX, northSouthRatio);
                 float easternMountainsX = Mathf.Lerp(easternMountainsNorthX, easternMountainsSouthX, northSouthRatio);
-                float easternCoastX = Mathf.Lerp(easternCoastNorthX, easternCoastSouthX, northSouthRatio);
+                float easternPlainsX = Mathf.Lerp(easternPlainsNorthX, easternPlainsSouthX, northSouthRatio);
+                float easternCoastX = Mathf.Lerp(easternCoastBaseNorthX, easternCoastBaseSouthX, northSouthRatio) + coastalNoise;
+                
+                // Constrain coastlines to stay within bounds (3% to 97%)
+                westernCoastX = Mathf.Clamp(westernCoastX, Width * 0.03f, Width * 0.08f);
+                easternCoastX = Mathf.Clamp(easternCoastX, Width * 0.92f, Width * 0.97f);
                 
                 float finalAltitude;
                 
-                // Determine which zone the hexagon is in and interpolate smoothly
+                // 7-zone altitude interpolation with realistic human settlement elevations
                 if (x <= westernCoastX)
                 {
                     // West Ocean to Western Coast transition
                     float t = x / westernCoastX;
-                    finalAltitude = Mathf.Lerp(7500f, westernCoastAltitude, t);
+                    finalAltitude = Mathf.Lerp(7500f, coastalAltitude, t);
+                }
+                else if (x <= westernPlainsX)
+                {
+                    // Western Coast to Western Coastal Plains transition
+                    float t = (x - westernCoastX) / (westernPlainsX - westernCoastX);
+                    finalAltitude = Mathf.Lerp(coastalAltitude, coastalPlainsAltitude, t);
                 }
                 else if (x <= westernMountainsX)
                 {
-                    // Western Coast to Western Mountains transition
-                    float t = (x - westernCoastX) / (westernMountainsX - westernCoastX);
-                    finalAltitude = Mathf.Lerp(westernCoastAltitude, westernMountainsAltitude, t);
+                    // Western Coastal Plains to Western Mountains transition
+                    float t = (x - westernPlainsX) / (westernMountainsX - westernPlainsX);
+                    finalAltitude = Mathf.Lerp(coastalPlainsAltitude, westernMountainsAltitude, t);
                 }
-                else if (x <= interiorValleyX)
+                else if (x <= centralPlainsX)
                 {
-                    // Western Mountains to Interior Valley transition
-                    float t = (x - westernMountainsX) / (interiorValleyX - westernMountainsX);
-                    finalAltitude = Mathf.Lerp(westernMountainsAltitude, interiorValleyAltitude, t);
+                    // Western Mountains to Central Plains transition
+                    float t = (x - westernMountainsX) / (centralPlainsX - westernMountainsX);
+                    finalAltitude = Mathf.Lerp(westernMountainsAltitude, centralPlainsAltitude, t);
                 }
                 else if (x <= easternMountainsX)
                 {
-                    // Interior Valley to Eastern Mountains transition
-                    float t = (x - interiorValleyX) / (easternMountainsX - interiorValleyX);
-                    finalAltitude = Mathf.Lerp(interiorValleyAltitude, easternMountainsAltitude, t);
+                    // Central Plains to Eastern Mountains transition
+                    float t = (x - centralPlainsX) / (easternMountainsX - centralPlainsX);
+                    finalAltitude = Mathf.Lerp(centralPlainsAltitude, easternMountainsAltitude, t);
+                }
+                else if (x <= easternPlainsX)
+                {
+                    // Eastern Mountains to Eastern Coastal Plains transition
+                    float t = (x - easternMountainsX) / (easternPlainsX - easternMountainsX);
+                    finalAltitude = Mathf.Lerp(easternMountainsAltitude, easternCoastalPlainsAltitude, t);
                 }
                 else if (x <= easternCoastX)
                 {
-                    // Eastern Mountains to Eastern Coast transition
-                    float t = (x - easternMountainsX) / (easternCoastX - easternMountainsX);
-                    finalAltitude = Mathf.Lerp(easternMountainsAltitude, easternCoastAltitude, t);
+                    // Eastern Coastal Plains to Eastern Coast transition
+                    float t = (x - easternPlainsX) / (easternCoastX - easternPlainsX);
+                    finalAltitude = Mathf.Lerp(easternCoastalPlainsAltitude, easternCoastalAltitude, t);
                 }
                 else
                 {
                     // Eastern Coast to East Ocean transition
                     float t = (x - easternCoastX) / ((Width - 1) - easternCoastX);
-                    finalAltitude = Mathf.Lerp(easternCoastAltitude, 7500f, t);
+                    finalAltitude = Mathf.Lerp(easternCoastalAltitude, 7500f, t);
                 }
                 
                 // Enforce minimum continental altitude (prevent inland seas)
                 if (x > westernCoastX && x < easternCoastX)
                 {
-                    finalAltitude = Mathf.Max(finalAltitude, 10500f); // Minimum continental altitude
+                    finalAltitude = Mathf.Max(finalAltitude, 10100f); // Minimum 100m above sea level
                 }
                 
-                // Add minimal noise for natural variation
-                finalAltitude += Random.Range(-25f, 25f); // Reduced noise
+                // Add minimal terrain variation
+                finalAltitude += Random.Range(-15f, 15f);
                 
                 hex.Altitude = finalAltitude;
                 hex.AltitudeOld = hex.Altitude;
             }
         }
         
-        UnityEngine.Debug.Log($"Continental profile generated: WCoast({westernCoastNorthX:F0}-{westernCoastSouthX:F0}) WMtns({westernMountainsNorthX:F0}-{westernMountainsSouthX:F0}) Valley({interiorValleyNorthX:F0}-{interiorValleySouthX:F0}) EMtns({easternMountainsNorthX:F0}-{easternMountainsSouthX:F0}) ECoast({easternCoastNorthX:F0}-{easternCoastSouthX:F0})");
+        UnityEngine.Debug.Log($"Realistic continental terrain generated: WCoast({westernCoastBaseNorthX:F0}-{westernCoastBaseSouthX:F0}) WPlains({westernPlainsNorthX:F0}-{westernPlainsSouthX:F0}) WMtns({westernMountainsNorthX:F0}-{westernMountainsSouthX:F0}) CPlains({centralPlainsNorthX:F0}-{centralPlainsSouthX:F0}) EMtns({easternMountainsNorthX:F0}-{easternMountainsSouthX:F0}) EPlains({easternPlainsNorthX:F0}-{easternPlainsSouthX:F0}) ECoast({easternCoastBaseNorthX:F0}-{easternCoastBaseSouthX:F0})");
     }
 
 }
