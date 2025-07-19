@@ -20,13 +20,7 @@ public class ControlPanel : MonoBehaviour
         if (populationText != null)
         {
             string activeView = GameSettings.ActiveOverlay == "None" ? "Biome" : GameSettings.ActiveOverlay;
-            populationText.text = "View: " + activeView + "\nEra: " + hexGrid.Era * 10 + " AG";
-        }
-
-        if (averageTemperatureText != null && hexGrid != null)
-        {
-            averageTemperatureText.text = "Avg. Temp: " + Mathf.Round(hexGrid.AverageGlobalTemperature * 10) / 10 + "°C";
-            averageTemperatureText.text += "\nSea Level: " + Mathf.Round(hexGrid.SeaLevel - hexGrid.GenesisSeaLevel) + "m\n";
+            populationText.text = "View: " + activeView + " | Era: " + hexGrid.Era * 10 + " AG";
         }
 
     }

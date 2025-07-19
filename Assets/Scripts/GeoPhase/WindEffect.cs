@@ -26,7 +26,29 @@ public class WindEffect
             Array.Clear(hex.WindSources, 0, hex.WindSources.Length);
             hex.WindDirection = 180;
             hex.WindIntensity = 25f;
-            hex.Evaporation = (hex.Altitude <= seaLevel) ? 10f : 2f;
+            
+            // Boost wind intensity for eastern ocean (strong maritime winds)
+            if (hex.Altitude <= seaLevel && hex.PositionX >= hexGrid.Width - 3) 
+            {
+                hex.WindIntensity = 75f; // Strong eastern ocean winds
+            }
+            
+            if (hex.Altitude <= seaLevel) 
+            {
+                // Check if this is one of the 3 easternmost ocean columns
+                if (hex.PositionX >= hexGrid.Width - 3) // Eastern edge columns
+                {
+                    hex.Evaporation = 60f; // 6x normal ocean evaporation for strong maritime winds
+                }
+                else 
+                {
+                    hex.Evaporation = 10f; // Normal ocean evaporation
+                }
+            }
+            else 
+            {
+                hex.Evaporation = 2f; // Land evaporation unchanged
+            }
         }
 
         //Calculate WindDirection & TemperatureNoWind
@@ -107,6 +129,13 @@ public class WindEffect
             hex.WindIntensity = Math.Max(0f, Math.Min(100f, hex.WindIntensity));
             hex.WaterVapour += waterVapour;
             hex.WaterVapour = Math.Max(0f, Math.Min(100f, hex.WaterVapour));
+            
+            // Boost WindIntensity and WaterVapour for eastern ocean edge (fierce ocean)
+            if (hex.Altitude <= seaLevel && hex.PositionX >= hexGrid.Width - 3) 
+            {
+                hex.WindIntensity = 100f; // Maximum wind intensity for fierce eastern ocean
+                hex.WaterVapour = 100f;   // Maximum water vapour from large ocean
+            }
         }
 
         hexGrid.AverageGlobalTemperature = Mathf.Round(windHexagons.Average(h => h.Temperature) * 10) / 10;
