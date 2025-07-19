@@ -167,7 +167,7 @@ public class HexGrid : MonoBehaviour
         System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start();
         GeoPhase phase = new GeoPhase(this, biomes);
-        int NumberOfGeoPhases = 0;
+        int NumberOfGeoPhases = 5;
         for (int i = 0; i < NumberOfGeoPhases; i++)
         {
             Era += 1; // Count initial generation cycles
