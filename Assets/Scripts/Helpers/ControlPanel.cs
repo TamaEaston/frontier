@@ -6,18 +6,19 @@ using System.Linq;
 
 public class ControlPanel : MonoBehaviour
 {
-    public TextMeshProUGUI populationText;
+    public TextMeshProUGUI infoPanel;
     public TextMeshProUGUI averageTemperatureText;
     public HexGrid hexGrid;
     public List<Biome> biomes;
     public Texture2D plateSelector;
     void Start()
     {
+        // Initialization if needed
     }
 
     void Update()
     {
-        if (populationText != null && hexGrid != null)
+        if (infoPanel != null && hexGrid != null)
         {
             string activeView = GameSettings.ActiveOverlay == "None" ? "Biome" : GameSettings.ActiveOverlay;
             
@@ -40,7 +41,7 @@ public class ControlPanel : MonoBehaviour
             
             float averageHeight = hexCount > 0 ? totalHeight / hexCount : 0f;
             
-            populationText.text = activeView + " | Era " + hexGrid.Era + " | Height " + averageHeight.ToString("F0") + "m";
+            infoPanel.text = activeView + " | Era " + hexGrid.Era + " | Height " + averageHeight.ToString("F0") + "m";
         }
 
     }
