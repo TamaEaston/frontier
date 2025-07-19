@@ -20,6 +20,12 @@ public class GeoPhase
         climateTemperature.Execute();
     }
 
+    public void ExecuteFertilityAssessment()
+    {
+        FertilityAssessment fertilityAssessment = new FertilityAssessment(hexGrid);
+        fertilityAssessment.Execute();
+    }
+
     public void ExecuteMagmaImpact()
     {
         MagmaImpact magmaImpact = new MagmaImpact(hexGrid);

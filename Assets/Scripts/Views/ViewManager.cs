@@ -37,6 +37,7 @@ public class ViewManager
             RegisterView("Altitude", new AltitudeView());
             RegisterView("Weather", new WeatherView());
             RegisterView("Temperature", new TemperatureView());
+            RegisterView("Fertility", new FertilityView());
             
             // Set default view
             SetActiveView("None");
@@ -148,6 +149,9 @@ public class ViewManager
                     break;
                 case KeyCode.Alpha5:
                     targetView = "Temperature";
+                    break;
+                case KeyCode.Alpha6:
+                    targetView = "Fertility";
                     break;
             }
             

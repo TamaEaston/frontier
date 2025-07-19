@@ -165,5 +165,24 @@ namespace Helpers
             // Convert the HSV color to RGB and return it.
             return Color.HSVToRGB(hue, 1, 1);
         }
+
+        public Color GetFertilityColour(float fertility, float heightAboveSeaLevel, float riverWidth)
+        {
+            // This method should only be called for land tiles
+            // Water tiles should use GetBiomeColour instead
+            
+            // Land hexes: Grey (fertility 0) to Bright Green (fertility 10)
+            float t = Mathf.InverseLerp(0, 10, fertility);
+            Color fertilityColor = Color.Lerp(Color.grey, Color.green, t);
+            
+            // If there's a river, blend with blue to show water presence
+            if (riverWidth > 0)
+            {
+                float riverIntensity = Mathf.Clamp01(riverWidth / 300f); // Scale based on max river width
+                fertilityColor = Color.Lerp(fertilityColor, new Color(0.2f, 0.6f, 1f), riverIntensity * 0.3f); // Subtle blue tint
+            }
+            
+            return fertilityColor;
+        }
     }
 }

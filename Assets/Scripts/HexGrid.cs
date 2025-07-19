@@ -175,6 +175,7 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteSlump();
             phase.ExecuteSeaLevel();
             phase.ExecuteClimateTemperature();
+            phase.ExecuteFertilityAssessment();
             phase.ExecuteWindEffect();
             phase.ExecuteRiverFlow();
         }
@@ -211,6 +212,7 @@ public class HexGrid : MonoBehaviour
                 Era += 1;
                 GeoPhase phase = new GeoPhase(this, biomes);
                 phase.ExecuteClimateTemperature();
+                phase.ExecuteFertilityAssessment();
                 phase.ExecuteMagmaImpact();
                 phase.ExecuteSlump();
                 phase.ExecuteSeaLevel();
@@ -270,6 +272,10 @@ public class HexGrid : MonoBehaviour
             else if (Input.GetKeyDown(KeyCode.Alpha5))
             {
                 viewManager.HandleViewInput(KeyCode.Alpha5);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha6))
+            {
+                viewManager.HandleViewInput(KeyCode.Alpha6);
             }
 
         }
@@ -353,6 +359,7 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteMagmaImpact();
             phase.ExecuteSlump();
             phase.ExecuteClimateTemperature();
+            phase.ExecuteFertilityAssessment();
             phase.ExecuteWindEffect();
             phase.ExecuteRiverFlow();
             phase.ExecuteSetBiomes();
@@ -570,6 +577,7 @@ public class HexGrid : MonoBehaviour
         {
             Era += 1; // Count initial generation cycles
             phase.ExecuteClimateTemperature();
+            phase.ExecuteFertilityAssessment();
             phase.ExecuteMagmaImpact();
             phase.ExecuteSlump();
             phase.ExecuteSeaLevel();
