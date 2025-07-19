@@ -414,7 +414,7 @@ public class HexGrid : MonoBehaviour
         // Interior Valley (midpoint between mountain ranges - RAISED to prevent inland seas)
         float interiorValleyNorthX = (westernMountainsNorthX + easternMountainsNorthX) / 2f;
         float interiorValleySouthX = (westernMountainsSouthX + easternMountainsSouthX) / 2f;
-        float interiorValleyAltitude = Random.Range(13000f, 16000f); // RAISED - well above sea level
+        float interiorValleyAltitude = Random.Range(10000f, 13000f); // RAISED - well above sea level
         
         // Eastern Coastline (92-97% of width - closer to edge)
         float easternCoastNorthX = Random.Range(Width * 0.92f, Width * 0.97f);
