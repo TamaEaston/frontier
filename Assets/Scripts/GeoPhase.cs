@@ -52,17 +52,6 @@ public class GeoPhase
         riverFlow.Execute();
     }
 
-    public void ExecuteHumanComfortAssessment()
-    {
-        HumanComfortAssessment humanComfort = new HumanComfortAssessment(hexGrid);
-        humanComfort.Execute();
-    }
-
-    public void ExecutePopulationGrowth()
-    {
-        PopulationGrowth populationGrowth = new PopulationGrowth(hexGrid);
-        populationGrowth.Execute();
-    }
 
     public void ExecuteSetBiomes()
     {

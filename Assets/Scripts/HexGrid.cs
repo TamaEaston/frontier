@@ -21,7 +21,6 @@ public class HexGrid : MonoBehaviour
 {
     public Hexagon HexagonPrefab;
     public Arrow ArrowPrefab;
-    public Settlement SettlementPrefab;
     public TextMeshProUGUI SeaLevelTextPrefab;
     public int Width;
     public int Height;
@@ -47,11 +46,6 @@ public class HexGrid : MonoBehaviour
     {
         return arrows;
     }
-    private Settlement[,] settlements;
-    public Settlement[,] GetSettlements()
-    {
-        return settlements;
-    }
 
     private RiverOverlay[,] riverLines;
     public RiverOverlay[,] getRiverLines()
@@ -71,7 +65,6 @@ public class HexGrid : MonoBehaviour
         NumberOfPlates = Mathf.Min(NumberOfPlates, 24); // Apply the restriction
         hexagons = new Hexagon[Width, Height];
         arrows = new Arrow[Width, Height];
-        settlements = new Settlement[Width, Height];
 
         float xDistance = 1.2f; // Adjust this value as necessary
         float yDistance = Mathf.Sqrt(3) * 0.6f; // Adjust this value as necessary
@@ -89,7 +82,6 @@ public class HexGrid : MonoBehaviour
                 // Assuming this is line 80
                 Hexagon hex = Instantiate(HexagonPrefab, new Vector3(positionX, positionY, 0), Quaternion.identity);
                 Arrow arrow = Instantiate(ArrowPrefab, new Vector3(positionX, positionY, -5), Quaternion.identity);
-                Settlement settlement = Instantiate(SettlementPrefab, new Vector3(positionX, positionY, -4), Quaternion.identity);
 
                 hex.hexGrid = this;
 
@@ -117,7 +109,6 @@ public class HexGrid : MonoBehaviour
 
                 hexagons[i, j] = hex;
                 arrows[i, j] = arrow;
-                settlements[i, j] = settlement;
             }
         }
 
@@ -176,9 +167,7 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteRiverFlow();
         }
         UnityEngine.Debug.Log("Time taken for " + NumberOfGeoPhases + " GeoPhases : " + stopwatch.ElapsedMilliseconds + " ms. Average: " + stopwatch.ElapsedMilliseconds / NumberOfGeoPhases + " ms");
-        phase.ExecuteHumanComfortAssessment();
         GenesisSeaLevel = SeaLevel;
-        AddHumanPopulation();
         phase.ExecuteSetBiomes();
         phase.ExecuteRefreshHexDisplay();
 
@@ -212,8 +201,6 @@ public class HexGrid : MonoBehaviour
                 phase.ExecuteSeaLevel();
                 phase.ExecuteWindEffect();
                 phase.ExecuteRiverFlow();
-                phase.ExecuteHumanComfortAssessment();
-                phase.ExecutePopulationGrowth();
                 phase.ExecuteSetBiomes();
                 phase.ExecuteEdgeGuard();
                 
@@ -254,15 +241,6 @@ public class HexGrid : MonoBehaviour
             toggleOverlay("Temperature");
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            toggleOverlay("HumanComfort");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha6))
-        {
-            toggleOverlay("Settlement");
-        }
     }
 
     private void Awake()
@@ -303,56 +281,6 @@ public class HexGrid : MonoBehaviour
         phase.ExecuteRefreshHexDisplay();
     }
 
-    void AddHumanPopulation()
-    {
-        List<Hexagon> eligibleHexagons = this.GetHexagons()
-            .OfType<Hexagon>()
-            .Where(hex => hex.HumanComfortIndex >= 90 && hex.AltitudeVsSeaLevel > 100)
-            .ToList();
-
-        List<Hexagon> centersOfPopulation = new List<Hexagon>();
-
-        // Randomly shuffle the eligible hexagons
-        System.Random rng = new System.Random();
-        int n = eligibleHexagons.Count;
-        while (n > 1)
-        {
-            n--;
-            int k = rng.Next(n + 1);
-            Hexagon value = eligibleHexagons[k];
-            eligibleHexagons[k] = eligibleHexagons[n];
-            eligibleHexagons[n] = value;
-        }
-
-        foreach (Hexagon hex in eligibleHexagons)
-        {
-            if (centersOfPopulation.Count == 5)
-            {
-                break;
-            }
-
-            bool isFarEnough = true;
-            foreach (Hexagon center in centersOfPopulation)
-            {
-                if (HexDistance(hex, center) < 6)
-                {
-                    isFarEnough = false;
-                    break;
-                }
-            }
-
-            if (isFarEnough)
-            {
-                hex.HumanPopulation = 50; // Set the population of the hex to 50
-
-                // Assign the hex to a Civilisation
-                hex.Civilisation = Civilisation.civilisations[centersOfPopulation.Count];
-
-                centersOfPopulation.Add(hex);
-            }
-        }
-
-    }
 
     int HexDistance(Hexagon a, Hexagon b)
     {
@@ -384,8 +312,6 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteSlump();
             phase.ExecuteWindEffect();
             phase.ExecuteRiverFlow();
-            phase.ExecuteHumanComfortAssessment();
-            phase.ExecutePopulationGrowth();
             phase.ExecuteSetBiomes();
             phase.ExecuteEdgeGuard();
         }

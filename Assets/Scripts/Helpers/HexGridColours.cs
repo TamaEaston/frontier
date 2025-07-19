@@ -21,8 +21,7 @@ namespace Helpers
                     return new Color(0.9f, 0.9f, 1.0f); // Very Light Blue
                 }
             }
-            else if (
-                SurfaceWater >= 100)
+            else if (SurfaceWater >= 100)
             {
                 if (Temperature > -5)
                 {
@@ -77,7 +76,6 @@ namespace Helpers
                 float t = Mathf.InverseLerp(0, 10000, heightAboveSeaLevel);
                 return Color.Lerp(new Color(0.13f, 0.55f, 0.13f), Color.white, t); // Forest Green to White
             }
-
         }
 
         public Color GetRainfallColour(float heightAboveSeaLevel, float SurfaceWater, float Rainfall)
@@ -96,7 +94,6 @@ namespace Helpers
                 float t = Mathf.InverseLerp(0, 50, Rainfall);
                 return Color.Lerp(Color.yellow, new Color(0, 0.39f, 0), t); // Yellow to Dark Green
             }
-
         }
 
         public Color GetTemperatureColour(float heightAboveSeaLevel, float SurfaceWater, float Temperature)
@@ -117,7 +114,6 @@ namespace Helpers
                     return new Color(0.6f, 0.8f, 1.0f); // Light Blue
                 }
             }
-
             else
             {
                 float t;
@@ -146,7 +142,6 @@ namespace Helpers
 
                 return Color.Lerp(startColour, endColour, t);
             }
-
         }
 
         public Color GetMagmaColour(float magmaIntensity)
@@ -154,6 +149,7 @@ namespace Helpers
             float t = Mathf.InverseLerp(0, 100, magmaIntensity); // Normalize magmaIntensity to the range [0, 1]
             return Color.Lerp(Color.yellow, Color.red, t); // Interpolate from Yellow to Red
         }
+
         public Color GetPlateColour(char plateId)
         {
             // Define the hue values for red and orange in the HSV color space.
@@ -169,37 +165,5 @@ namespace Helpers
             // Convert the HSV color to RGB and return it.
             return Color.HSVToRGB(hue, 1, 1);
         }
-
-        public Color GetHumanComfortColour(float heightAboveSeaLevel, float SurfaceWater, float HumanComfortIndex)
-        {
-            if (heightAboveSeaLevel < 0)
-            {
-                float t = Mathf.InverseLerp(-10000, 0, heightAboveSeaLevel);
-                return Color.Lerp(new Color(0, 0, 0.5f), new Color(0.4f, 0.7f, 0.8f), t); // Dark Blue to Light Sea Blue
-            }
-            else if (SurfaceWater >= 100)
-            {
-                return new Color(0.0f, 0.5f, 0.5f);
-            }
-            else
-            {
-                if (HumanComfortIndex < 10)
-                {
-                    return Color.black;
-                }
-                else if (HumanComfortIndex <= 40)
-                {
-                    float t = Mathf.InverseLerp(10, 40, HumanComfortIndex);
-                    return Color.Lerp(Color.red, Color.yellow, t);
-                }
-                else
-                {
-                    float t = Mathf.InverseLerp(40, 100, HumanComfortIndex);
-                    return Color.Lerp(Color.yellow, new Color(0.0f, 0.5f, 0.0f), t);
-                }
-            }
-
-        }
-
     }
 }

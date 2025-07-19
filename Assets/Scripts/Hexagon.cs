@@ -30,14 +30,6 @@ public class Hexagon : MonoBehaviour
     public float SolarIntensity;
     public float TemperatureNoWind;
     public float Temperature;
-    public float HumanComfortIndex;
-    public float HumanComfortIndexChange;
-    public float HumanPopulation;
-    public float HumanPopulationNew;
-    public float HumanPopulationChange;
-    public Civilisation Civilisation { get; set; }
-    public int HumanSettlement;
-    public int HumanSettlementRuins;
 
     public Hexagon[] Neighbours = new Hexagon[6];
     public Hexagon[] WindSources = new Hexagon[6];
@@ -98,7 +90,6 @@ public class Hexagon : MonoBehaviour
             else if (GameSettings.EditMode == "CreateVolcano")
             {
                 VolcanicActivity = 100;
-                HumanPopulation = 0;
                 GameSettings.EditMode = "None";
                 UnityEngine.Debug.Log("Volcano created");
                 Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
@@ -118,8 +109,7 @@ public class Hexagon : MonoBehaviour
                 // Create a tooltip window
                 int x = (int)Input.mousePosition.x;
                 int y = (int)(Screen.height - Input.mousePosition.y); // Convert to GUI coordinates
-                string civilisationName = this.Civilisation != null ? this.Civilisation.Name : "None";
-                string tooltipText = $"Civilisation: {civilisationName}\nHumanComfortIndex: {HumanComfortIndex}\nHumanPopulation: {HumanPopulation}\nHumanPopulationNew: {HumanPopulationNew}\nHexagonID: {HexagonID}\nPositionX: {PositionX}\nPositionY: {PositionY}\nAltitude: {Altitude}\nAltitudeChange: {AltitudeChange}\nHeightAboveSeaLevel: {HeightAboveSeaLevel}\nAltitudeVsSeaLevel: {AltitudeVsSeaLevel}\nMagmaIntensity: {MagmaIntensity}\nMagmaDirection: {MagmaDirection}\nWindIntensity: {WindIntensity}\nWindChange: {WindChange}\nWindDirection: {WindDirection}\nEvaporation: {Evaporation}\nWaterVapour: {WaterVapour}\nRainfall: {Rainfall}\nSurfaceWater: {SurfaceWater}\nSurfaceWaterNew: {SurfaceWaterNew}\nRiverWidth: {RiverWidth}\nSolarIntensity: {SolarIntensity}\nTemperatureNoWind: {TemperatureNoWind}\nTemperature: {Temperature}";
+                string tooltipText = $"HexagonID: {HexagonID}\nPositionX: {PositionX}\nPositionY: {PositionY}\nAltitude: {Altitude}\nAltitudeChange: {AltitudeChange}\nHeightAboveSeaLevel: {HeightAboveSeaLevel}\nAltitudeVsSeaLevel: {AltitudeVsSeaLevel}\nMagmaIntensity: {MagmaIntensity}\nMagmaDirection: {MagmaDirection}\nWindIntensity: {WindIntensity}\nWindChange: {WindChange}\nWindDirection: {WindDirection}\nEvaporation: {Evaporation}\nWaterVapour: {WaterVapour}\nRainfall: {Rainfall}\nSurfaceWater: {SurfaceWater}\nSurfaceWaterNew: {SurfaceWaterNew}\nRiverWidth: {RiverWidth}\nSolarIntensity: {SolarIntensity}\nTemperatureNoWind: {TemperatureNoWind}\nTemperature: {Temperature}";
 
                 // Create a GUIStyle for the tooltip
                 GUIStyle tooltipStyle = new GUIStyle(GUI.skin.box);

@@ -47,10 +47,6 @@ public class RefreshHexGridDisplay
                 {
                     altitudeColour = hexGrid.colours.GetTemperatureColour(hex.AltitudeVsSeaLevel, (float)hex.SurfaceWater, (float)hex.Temperature);
                 }
-                else if (GameSettings.ActiveOverlay == "HumanComfort")
-                {
-                    altitudeColour = hexGrid.colours.GetHumanComfortColour(hex.AltitudeVsSeaLevel, (float)hex.SurfaceWater, (float)hex.HumanComfortIndex);
-                }
                 else
                 {
                     if (hex.Biome != null)
@@ -137,13 +133,6 @@ public class RefreshHexGridDisplay
                     //                    UnityEngine.Debug.Log("River Lines drawn from " + startPos + " to " + endPos);
                 }
 
-                //Settlement Overlay
-                Settlement settlementHex = hexGrid.GetSettlements()[i, j];
-                Color settlementColour = hex.Civilisation != null ? hex.Civilisation.Colour : Color.white;
-                settlementColour.a = (hex.HumanPopulation > 10) ? 1f : 0f;
-                settlementHex.SpriteRenderer.color = settlementColour;
-                float settlementScale = Math.Min(0.5f, hex.HumanPopulation / 300f);
-                settlementHex.transform.localScale = new Vector3(settlementScale, settlementScale, 1f);
 
 
                 if (GameSettings.ActiveOverlay == "Magma")
