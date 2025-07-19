@@ -124,6 +124,10 @@ public class HexGrid : MonoBehaviour
         // Generate Continental Terrain
         GenerateContinentalTerrain();
 
+        // Apply EdgeGuard immediately after terrain generation to ensure ocean boundaries
+        GeoPhase edgePhase = new GeoPhase(this, biomes);
+        edgePhase.ExecuteEdgeGuard();
+
         // Set Neighbours...
         for (int i = 0; i < Width; i++)
         {
@@ -519,8 +523,30 @@ public class HexGrid : MonoBehaviour
                     finalAltitude = Mathf.Max(finalAltitude, 10100f); // Minimum 100m above sea level
                 }
                 
-                // Add minimal terrain variation
-                finalAltitude += Random.Range(-15f, 15f);
+                // Add zone-appropriate terrain variation
+                float terrainNoise;
+                if (x <= westernCoastX || x >= easternCoastX)
+                {
+                    // Coastal areas: Moderate variation for beaches, cliffs, dunes
+                    terrainNoise = Random.Range(-50f, 50f);
+                }
+                else if (x <= westernPlainsX || x >= easternPlainsX)
+                {
+                    // Coastal plains: Rolling hills and valleys
+                    terrainNoise = Random.Range(-100f, 100f);
+                }
+                else if (x <= westernMountainsX || x >= easternMountainsX)
+                {
+                    // Mountains: High variation for peaks, valleys, ridges
+                    terrainNoise = Random.Range(-300f, 300f);
+                }
+                else
+                {
+                    // Central plains: Gentle rolling terrain
+                    terrainNoise = Random.Range(-75f, 75f);
+                }
+                
+                finalAltitude += terrainNoise;
                 
                 hex.Altitude = finalAltitude;
                 hex.AltitudeOld = hex.Altitude;
