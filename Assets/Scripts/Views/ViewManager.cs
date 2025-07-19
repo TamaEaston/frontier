@@ -134,19 +134,19 @@ public class ViewManager
             
             switch (keyCode)
             {
-                case KeyCode.Alpha0:
+                case KeyCode.Alpha1:
                     targetView = "None";
                     break;
-                case KeyCode.Alpha1:
+                case KeyCode.Alpha2:
                     targetView = "Magma";
                     break;
-                case KeyCode.Alpha2:
+                case KeyCode.Alpha3:
                     targetView = "Altitude";
                     break;
-                case KeyCode.Alpha3:
+                case KeyCode.Alpha4:
                     targetView = "Weather";
                     break;
-                case KeyCode.Alpha4:
+                case KeyCode.Alpha5:
                     targetView = "Temperature";
                     break;
             }

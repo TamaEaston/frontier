@@ -256,6 +256,11 @@ public class HexGrid : MonoBehaviour
             {
                 viewManager.HandleViewInput(KeyCode.Alpha4);
             }
+            else if (Input.GetKeyDown(KeyCode.Alpha5))
+            {
+                viewManager.HandleViewInput(KeyCode.Alpha5);
+            }
+
         }
 
     }

@@ -114,6 +114,13 @@ public class WindEffect
                 // Apply altitude cooling to continental temperature (preserve the linear arctic-desert gradient)
                 hex.TemperatureNoWind = hex.TemperatureNoWind - (4 * Mathf.Pow(2, hex.HeightAboveSeaLevel / 1000f - 1));
             }
+            
+            // Boost WindChange for eastern ocean (before propagation calculation)
+            if (hex.Altitude <= seaLevel && hex.PositionX >= hexGrid.Width - 3) 
+            {
+                hex.WindChange = 50f; // Massive wind change for fierce eastern ocean
+            }
+            
             hex.Temperature = Math.Max(-50, Math.Min(50, hex.TemperatureNoWind));
         }
 
@@ -130,11 +137,11 @@ public class WindEffect
             hex.WaterVapour += waterVapour;
             hex.WaterVapour = Math.Max(0f, Math.Min(100f, hex.WaterVapour));
             
-            // Boost WindIntensity and WaterVapour for eastern ocean edge (fierce ocean)
+            // Ensure eastern ocean edge maintains maximum values
             if (hex.Altitude <= seaLevel && hex.PositionX >= hexGrid.Width - 3) 
             {
-                hex.WindIntensity = 100f; // Maximum wind intensity for fierce eastern ocean
-                hex.WaterVapour = 100f;   // Maximum water vapour from large ocean
+                hex.WindIntensity = Math.Max(hex.WindIntensity, 100f); // Ensure minimum 100
+                hex.WaterVapour = Math.Max(hex.WaterVapour, 100f);     // Ensure minimum 100
             }
         }
 
