@@ -21,6 +21,7 @@ public class HexGrid : MonoBehaviour
 {
     public Hexagon HexagonPrefab;
     public Arrow ArrowPrefab;
+    public RiverOverlay RiverOverlayPrefab;
     public TextMeshProUGUI SeaLevelTextPrefab;
     public int Width;
     public int Height;
@@ -67,6 +68,7 @@ public class HexGrid : MonoBehaviour
         NumberOfPlates = Mathf.Min(NumberOfPlates, 24); // Apply the restriction
         hexagons = new Hexagon[Width, Height];
         arrows = new Arrow[Width, Height];
+        riverLines = new RiverOverlay[Width, Height];
 
         float xDistance = 1.2f; // Adjust this value as necessary
         float yDistance = Mathf.Sqrt(3) * 0.6f; // Adjust this value as necessary
@@ -84,6 +86,11 @@ public class HexGrid : MonoBehaviour
                 // Assuming this is line 80
                 Hexagon hex = Instantiate(HexagonPrefab, new Vector3(positionX, positionY, 0), Quaternion.identity);
                 Arrow arrow = Instantiate(ArrowPrefab, new Vector3(positionX, positionY, -5), Quaternion.identity);
+                RiverOverlay riverOverlay = null;
+                if (RiverOverlayPrefab != null)
+                {
+                    riverOverlay = Instantiate(RiverOverlayPrefab, new Vector3(positionX, positionY, -2), Quaternion.identity);
+                }
 
                 hex.hexGrid = this;
 
@@ -103,14 +110,12 @@ public class HexGrid : MonoBehaviour
                 // Assign Rainfall for testing
                 hex.Rainfall = 25;
 
-                // Calculate solar intensity
-                float latitude = Mathf.Clamp(2.0f * j / (Height - 1) - 1.0f, -1.0f, 1.0f);
-                float power = 0.6f;
-                float sinValue = Mathf.Sin((latitude + 1) * Mathf.PI / 2.0f);
-                hex.SolarIntensity = (EquatorSolarIntensity - EquatorToPolarSolarIntensityDifference) + EquatorToPolarSolarIntensityDifference * Mathf.Pow(Mathf.Abs(sinValue), power);
+                // SolarIntensity will be set by ClimateTemperature.cs during simulation
+                hex.SolarIntensity = 0f;
 
                 hexagons[i, j] = hex;
                 arrows[i, j] = arrow;
+                riverLines[i, j] = riverOverlay;
             }
         }
 
@@ -165,6 +170,7 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteMagmaImpact();
             phase.ExecuteSlump();
             phase.ExecuteSeaLevel();
+            phase.ExecuteClimateTemperature();
             phase.ExecuteWindEffect();
             phase.ExecuteRiverFlow();
         }
@@ -330,6 +336,7 @@ public class HexGrid : MonoBehaviour
             GeoPhase phase = new GeoPhase(this, biomes);
             phase.ExecuteMagmaImpact();
             phase.ExecuteSlump();
+            phase.ExecuteClimateTemperature();
             phase.ExecuteWindEffect();
             phase.ExecuteRiverFlow();
             phase.ExecuteSetBiomes();

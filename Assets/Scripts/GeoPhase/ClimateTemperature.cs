@@ -4,39 +4,58 @@ using UnityEngine;
 public class ClimateTemperature
 {
     private HexGrid hexGrid;
+    private readonly bool isNorthArctic;
 
     public ClimateTemperature(HexGrid hexGrid)
     {
         this.hexGrid = hexGrid;
+        // Deterministically assign arctic boundary based on map dimensions
+        // This ensures consistency across multiple runs for the same map
+        int seed = hexGrid.Width * 1000 + hexGrid.Height;
+        UnityEngine.Random.InitState(seed);
+        isNorthArctic = UnityEngine.Random.value > 0.5f;
     }
 
     public void Execute()
     {
-        float TemperatureChange = 0.0f;
-
-        switch (GameSettings.ClimateMode)
+        float temperatureChange = GameSettings.ClimateMode switch
         {
-            case "Cooling":
-                TemperatureChange = -0.5f;
-                break;
-            case "Warming":
-                TemperatureChange = 0.5f;
-                break;
-            default:
-                TemperatureChange = 0f; // Default value
-                break;
-        }
-        hexGrid.EquatorSolarIntensity = hexGrid.EquatorSolarIntensity + TemperatureChange;
+            "Cooling" => -0.5f,
+            "Warming" => 0.5f,
+            _ => 0f
+        };
+        hexGrid.EquatorSolarIntensity += temperatureChange;
 
         var allHexagons = hexGrid.GetHexagons().Cast<Hexagon>().ToList();
 
+        // Continental temperature system
+        const float arcticBaseTemp = -5f;
+        const float desertBaseTemp = 40f;
+        
         foreach (var hex in allHexagons)
         {
-            // Calculate solar intensity
-            float latitude = Mathf.Clamp(2.0f * hex.PositionY / (hexGrid.Height - 1) - 1.0f, -1.0f, 1.0f);
-            float power = 0.6f;
-            float sinValue = Mathf.Sin((latitude + 1) * Mathf.PI / 2.0f);
-            hex.SolarIntensity = (hexGrid.EquatorSolarIntensity - hexGrid.EquatorToPolarSolarIntensityDifference) + hexGrid.EquatorToPolarSolarIntensityDifference * Mathf.Pow(Mathf.Abs(sinValue), power);
+            // Calculate north-south position (0.0 = north edge, 1.0 = south edge)
+            float northSouthPosition = (float)hex.PositionY / (hexGrid.Height - 1);
+            
+            // Determine temperature based on which end is arctic
+            float baseTemp;
+            if (isNorthArctic)
+            {
+                // North is arctic, South is desert
+                baseTemp = Mathf.Lerp(arcticBaseTemp, desertBaseTemp, northSouthPosition);
+            }
+            else
+            {
+                // South is arctic, North is desert
+                baseTemp = Mathf.Lerp(desertBaseTemp, arcticBaseTemp, northSouthPosition);
+            }
+            
+            // Apply global climate modifier (EquatorSolarIntensity change)
+            float finalTemp = baseTemp + temperatureChange;
+            
+            // Set both SolarIntensity (for backward compatibility) and direct temperature
+            hex.SolarIntensity = finalTemp;
+            hex.TemperatureNoWind = finalTemp;
         }
     }
 }

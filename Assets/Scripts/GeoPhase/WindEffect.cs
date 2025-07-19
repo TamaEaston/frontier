@@ -83,13 +83,14 @@ public class WindEffect
             if (directionNeighbour != null && directionNeighbour.Altitude <= seaLevel)
             {
                 hex.WindChange = 2;
-                hex.TemperatureNoWind = hex.SolarIntensity;
+                // Keep continental temperature for water/coastal areas (TemperatureNoWind was set by ClimateTemperature.cs)
             }
             else
             {
                 float AltitudeChange = (awayNeighbour != null) ? (awayNeighbour.HeightAboveSeaLevel - hex.HeightAboveSeaLevel) : 0;
                 hex.WindChange = (AltitudeChange > 0) ? (AltitudeChange / 100f) : (AltitudeChange / 50f);
-                hex.TemperatureNoWind = hex.SolarIntensity - (4 * Mathf.Pow(2, hex.HeightAboveSeaLevel / 1000f - 1));
+                // Apply altitude cooling to continental temperature (preserve the linear arctic-desert gradient)
+                hex.TemperatureNoWind = hex.TemperatureNoWind - (4 * Mathf.Pow(2, hex.HeightAboveSeaLevel / 1000f - 1));
             }
             hex.Temperature = Math.Max(-50, Math.Min(50, hex.TemperatureNoWind));
         }
