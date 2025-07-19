@@ -19,12 +19,13 @@ public class ControlPanel : MonoBehaviour
     {
         if (populationText != null)
         {
-            populationText.text = "Era: " + hexGrid.Era * 10 + " AG";
+            string activeView = GameSettings.ActiveOverlay == "None" ? "Biome" : GameSettings.ActiveOverlay;
+            populationText.text = "View: " + activeView + "\nEra: " + hexGrid.Era * 10 + " AG";
         }
 
         if (averageTemperatureText != null && hexGrid != null)
         {
-            averageTemperatureText.text = "Avg. Temp: " + Mathf.Round((hexGrid.AverageGlobalTemperature * 10)) / 10 + "°C";
+            averageTemperatureText.text = "Avg. Temp: " + Mathf.Round(hexGrid.AverageGlobalTemperature * 10) / 10 + "°C";
             averageTemperatureText.text += "\nSea Level: " + Mathf.Round(hexGrid.SeaLevel - hexGrid.GenesisSeaLevel) + "m\n";
         }
 
