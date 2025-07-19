@@ -46,6 +46,8 @@ public class HexGrid : MonoBehaviour
     {
         return arrows;
     }
+    
+    private ViewManager viewManager;
 
     private RiverOverlay[,] riverLines;
     public RiverOverlay[,] getRiverLines()
@@ -169,7 +171,10 @@ public class HexGrid : MonoBehaviour
         UnityEngine.Debug.Log("Time taken for " + NumberOfGeoPhases + " GeoPhases : " + stopwatch.ElapsedMilliseconds + " ms. Average: " + stopwatch.ElapsedMilliseconds / NumberOfGeoPhases + " ms");
         GenesisSeaLevel = SeaLevel;
         phase.ExecuteSetBiomes();
-        phase.ExecuteRefreshHexDisplay();
+        
+        // Initialize the new view system
+        viewManager = new ViewManager(this);
+        viewManager.RefreshDisplay();
 
     }
 
@@ -207,7 +212,14 @@ public class HexGrid : MonoBehaviour
                 // Only refresh display on the final cycle for performance
                 if (cycle == 9)
                 {
-                    phase.ExecuteRefreshHexDisplay();
+                    if (viewManager != null)
+                    {
+                        viewManager.RefreshDisplay();
+                    }
+                    else
+                    {
+                        phase.ExecuteRefreshHexDisplay();
+                    }
                 }
             }
 
@@ -215,30 +227,29 @@ public class HexGrid : MonoBehaviour
             UnityEngine.Debug.Log($"10 geological cycles completed in {stopwatch.ElapsedMilliseconds} ms (Era {Era})");
         }
 
-        //Toggle Overlays
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        //Toggle Views using ViewManager
+        if (viewManager != null)
         {
-            toggleOverlay("None");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            toggleOverlay("Magma");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            toggleOverlay("Altitude");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            toggleOverlay("Weather");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            toggleOverlay("Temperature");
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                viewManager.HandleViewInput(KeyCode.Alpha0);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                viewManager.HandleViewInput(KeyCode.Alpha1);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                viewManager.HandleViewInput(KeyCode.Alpha2);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                viewManager.HandleViewInput(KeyCode.Alpha3);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                viewManager.HandleViewInput(KeyCode.Alpha4);
+            }
         }
 
     }
@@ -277,8 +288,17 @@ public class HexGrid : MonoBehaviour
             GameSettings.ActiveOverlay = "None";
         }
         UnityEngine.Debug.Log("Active Overlay: " + GameSettings.ActiveOverlay);
-        GeoPhase phase = new GeoPhase(this, biomes);
-        phase.ExecuteRefreshHexDisplay();
+        
+        // Use ViewManager for display refresh
+        if (viewManager != null)
+        {
+            viewManager.RefreshDisplay();
+        }
+        else
+        {
+            GeoPhase phase = new GeoPhase(this, biomes);
+            phase.ExecuteRefreshHexDisplay();
+        }
     }
 
 
@@ -305,9 +325,9 @@ public class HexGrid : MonoBehaviour
 
     public void RefreshDisplay(bool DisplayOnly = true)
     {
-        GeoPhase phase = new GeoPhase(this, biomes);
         if (!DisplayOnly)
         {
+            GeoPhase phase = new GeoPhase(this, biomes);
             phase.ExecuteMagmaImpact();
             phase.ExecuteSlump();
             phase.ExecuteWindEffect();
@@ -316,7 +336,17 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteEdgeGuard();
         }
 
-        phase.ExecuteRefreshHexDisplay();
+        // Use ViewManager for display refresh
+        if (viewManager != null)
+        {
+            viewManager.RefreshDisplay();
+        }
+        else
+        {
+            // Fallback to old system if ViewManager not initialized
+            GeoPhase phase = new GeoPhase(this, biomes);
+            phase.ExecuteRefreshHexDisplay();
+        }
     }
 
     private void GenerateContinentalTerrain()

@@ -9,6 +9,7 @@ public class Hexagon : MonoBehaviour
     public int PositionY;
 
     public SpriteRenderer SpriteRenderer;
+    public Sprite originalSprite;
     public float Altitude;
     public float AltitudeNew;
     public float AltitudeOld;
