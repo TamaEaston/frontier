@@ -31,11 +31,11 @@ public class MagmaImpact
                 // Adjust the Altitude of the two identified neighbouring hexagons based on the MagmaIntensity
                 if (towardsNeighbour != null)
                 {
-                    towardsNeighbour.Altitude += hex.MagmaIntensity;
+                    towardsNeighbour.Altitude += (hex.MagmaIntensity / 2);
                 }
                 if (awayNeighbour != null)
                 {
-                    awayNeighbour.Altitude -= hex.MagmaIntensity;
+                    awayNeighbour.Altitude -= (hex.MagmaIntensity / 2);
                 }
 
                 //                Debug.Log("Hexagon: " + hex + " is pointing towards " + towardsNeighbour + " and away from " + awayNeighbour + " with a MagmaIntensity of " + hex.MagmaIntensity + " and a MagmaDirection of " + hex.MagmaDirection + " degrees.");

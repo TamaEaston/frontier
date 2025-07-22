@@ -26,6 +26,8 @@ public class ControlPanel : MonoBehaviour
             float totalHeight = 0f;
             float totalRainfall = 0f;
             float totalTemperature = 0f;
+            float totalFertility = 0f;
+            float totalWindIntensity = 0f;
             int landHexCount = 0;
             var hexagons = hexGrid.GetHexagons();
             
@@ -38,6 +40,8 @@ public class ControlPanel : MonoBehaviour
                         totalHeight += hexagons[i, j].HeightAboveSeaLevel;
                         totalRainfall += hexagons[i, j].Rainfall;
                         totalTemperature += hexagons[i, j].Temperature;
+                        totalFertility += hexagons[i, j].Fertility;
+                        totalWindIntensity += hexagons[i, j].WindIntensity;
                         landHexCount++;
                     }
                 }
@@ -46,8 +50,10 @@ public class ControlPanel : MonoBehaviour
             float averageHeight = landHexCount > 0 ? totalHeight / landHexCount : 0f;
             float averageRainfall = landHexCount > 0 ? totalRainfall / landHexCount : 0f;
             float averageTemperature = landHexCount > 0 ? totalTemperature / landHexCount : 0f;
+            float averageFertility = landHexCount > 0 ? totalFertility / landHexCount : 0f;
+            float averageWindIntensity = landHexCount > 0 ? totalWindIntensity / landHexCount : 0f;
             
-            infoPanel.text = activeView + " | Era " + hexGrid.Era + " | Height " + averageHeight.ToString("F0") + "m | Rainfall " + averageRainfall.ToString("F0") + " | Temp " + averageTemperature.ToString("F0") + "°C";
+            infoPanel.text = activeView + " | Era " + hexGrid.Era + " | Height " + averageHeight.ToString("F0") + "m | Rainfall " + averageRainfall.ToString("F0") + " | Temp " + averageTemperature.ToString("F0") + "°C | Fertility " + averageFertility.ToString("F1") + " | Wind " + averageWindIntensity.ToString("F0");
         }
 
     }

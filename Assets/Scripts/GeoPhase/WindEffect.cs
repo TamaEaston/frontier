@@ -110,7 +110,7 @@ public class WindEffect
             else
             {
                 float AltitudeChange = (awayNeighbour != null) ? (awayNeighbour.HeightAboveSeaLevel - hex.HeightAboveSeaLevel) : 0;
-                hex.WindChange = (AltitudeChange > 0) ? (AltitudeChange / 100f) : (AltitudeChange / 50f);
+                hex.WindChange = (AltitudeChange > 0) ? (AltitudeChange / 200f) : (AltitudeChange / 25f);
                 // Apply altitude cooling to continental temperature (preserve the linear arctic-desert gradient)
                 hex.TemperatureNoWind = hex.TemperatureNoWind - (4 * Mathf.Pow(2, hex.HeightAboveSeaLevel / 1000f - 1));
             }
@@ -184,7 +184,8 @@ public class WindEffect
                     continue;
 
                 visited.Add(windSource);
-                totalWindChange += windSource.WindChange;
+                float landFriction = (windSource.Altitude > seaLevel) ? 0.85f : 1.0f;
+                totalWindChange += windSource.WindChange * landFriction;
                 totalWaterVapour += windSource.Evaporation;
                 var (windIntensity, waterVapour) = CalculateWindIntensityAndWaterVapour(windSource, yStart, yLimit, visited);
                 totalWindChange += windIntensity;

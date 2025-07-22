@@ -9,7 +9,7 @@ public class FertilityAssessment
     int temperatureSweetSpotMin = 10;
     int temperatureSweetSpotMax = 30;
     int altitudeSweetSpotMin = 0;
-    int altitudeSweetSpotMax = 2000;
+    int altitudeSweetSpotMax = 800;
     int rainfallSweetSpotMin = 20;
     int rainfallSweetSpotMax = 40;
     int riverWidthSweetSpotMin = 50;
@@ -27,12 +27,6 @@ public class FertilityAssessment
 
         foreach (var hex in allHexagons)
         {
-            // Calculate individual scores (0-10 each)
-            float temperatureScore = CalculateScore(hex.Temperature, temperatureSweetSpotMin, temperatureSweetSpotMax, 10);
-            float altitudeScore = CalculateScore(hex.HeightAboveSeaLevel, altitudeSweetSpotMin, altitudeSweetSpotMax, 10);
-            float rainfallScore = CalculateScore(hex.Rainfall, rainfallSweetSpotMin, rainfallSweetSpotMax);
-            float riverWidthScore = CalculateScore(hex.RiverWidth, riverWidthSweetSpotMin, riverWidthSweetSpotMax);
-
             // Exclusion criteria: only underwater hexes
             if (hex.HeightAboveSeaLevel < 0)
             {
@@ -40,11 +34,23 @@ public class FertilityAssessment
             }
             else
             {
-                // Weighted calculation: Rainfall×4 + Temperature×3 + RiverWidth×2 + Altitude×1
-                // Scale to 0-10 range
-                float totalScore = (rainfallScore * 4f) + (temperatureScore * 3f) + (riverWidthScore * 2f) + (altitudeScore * 1f);
-                float maxPossibleScore = (10 * 4f) + (10 * 3f) + (10 * 2f) + (10 * 1f); // = 100
-                hex.Fertility = Mathf.Clamp(totalScore / maxPossibleScore * 10f, 0f, 10f);
+                // Calculate individual scores (0-10 each)
+                float temperatureScore = CalculateScore(hex.Temperature, temperatureSweetSpotMin, temperatureSweetSpotMax, 2);
+                float altitudeScore = CalculateScore(hex.HeightAboveSeaLevel, altitudeSweetSpotMin, altitudeSweetSpotMax, 2);
+                float rainfallScore = CalculateScore(hex.Rainfall, rainfallSweetSpotMin, rainfallSweetSpotMax);
+                float riverWidthScore = CalculateScore(hex.RiverWidth, riverWidthSweetSpotMin, riverWidthSweetSpotMax);
+                
+                // Water: Take the BETTER of rainfall or rivers (not both)
+                float waterScore = Mathf.Max(rainfallScore, riverWidthScore);
+                
+                // Multiplicative calculation: ALL factors must be decent
+                // Convert 0-10 scores to 0-1 multipliers
+                float tempMultiplier = temperatureScore / 10f;
+                float altitudeMultiplier = altitudeScore / 10f;
+                float waterMultiplier = waterScore / 10f;
+                
+                // Final fertility: product of all factors, scaled back to 0-10
+                hex.Fertility = tempMultiplier * altitudeMultiplier * waterMultiplier * 10f;
             }
         }
     }
