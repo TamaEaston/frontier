@@ -111,7 +111,8 @@ public class Hexagon : MonoBehaviour
                 // Create a tooltip window
                 int x = (int)Input.mousePosition.x;
                 int y = (int)(Screen.height - Input.mousePosition.y); // Convert to GUI coordinates
-                string tooltipText = $"HexagonID: {HexagonID}\nPositionX: {PositionX}\nPositionY: {PositionY}\nAltitude: {Altitude}\nAltitudeChange: {AltitudeChange}\nHeightAboveSeaLevel: {HeightAboveSeaLevel}\nAltitudeVsSeaLevel: {AltitudeVsSeaLevel}\nMagmaIntensity: {MagmaIntensity}\nMagmaDirection: {MagmaDirection}\nWindIntensity: {WindIntensity}\nWindChange: {WindChange}\nWindDirection: {WindDirection}\nEvaporation: {Evaporation}\nWaterVapour: {WaterVapour}\nRainfall: {Rainfall}\nSurfaceWater: {SurfaceWater}\nSurfaceWaterNew: {SurfaceWaterNew}\nRiverWidth: {RiverWidth}\nSolarIntensity: {SolarIntensity}\nTemperatureNoWind: {TemperatureNoWind}\nTemperature: {Temperature}\nFertility: {Fertility:F1}";
+                string biomeInfo = Biome != null ? Biome.Name : "None";
+                string tooltipText = $"HexagonID: {HexagonID}\nBiome: {biomeInfo}\nPositionX: {PositionX}\nPositionY: {PositionY}\nAltitude: {Altitude}\nAltitudeChange: {AltitudeChange}\nHeightAboveSeaLevel: {HeightAboveSeaLevel}\nAltitudeVsSeaLevel: {AltitudeVsSeaLevel}\nMagmaIntensity: {MagmaIntensity}\nMagmaDirection: {MagmaDirection}\nWindIntensity: {WindIntensity}\nWindChange: {WindChange}\nWindDirection: {WindDirection}\nEvaporation: {Evaporation}\nWaterVapour: {WaterVapour}\nRainfall: {Rainfall}\nSurfaceWater: {SurfaceWater}\nSurfaceWaterNew: {SurfaceWaterNew}\nRiverWidth: {RiverWidth}\nSolarIntensity: {SolarIntensity}\nTemperatureNoWind: {TemperatureNoWind}\nTemperature: {Temperature}\nFertility: {Fertility:F1}";
 
                 // Output all hexagon values to console
                 UnityEngine.Debug.Log($"Hexagon Clicked - {tooltipText.Replace("\n", " | ")}");

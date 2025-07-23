@@ -55,7 +55,9 @@ public class SetBiomes
                     biome.Temperature.Min <= hex.Temperature &&
                     hex.Temperature <= biome.Temperature.Max &&
                     biome.Rainfall.Min <= hex.Rainfall &&
-                    hex.Rainfall <= biome.Rainfall.Max)
+                    hex.Rainfall <= biome.Rainfall.Max &&
+                    biome.SurfaceWater.Min <= hex.SurfaceWater &&
+                    hex.SurfaceWater <= biome.SurfaceWater.Max)
                 {
                     hex.Biome = biome;
                     // UnityEngine.Debug.Log("Biome set: " + biome.Name);

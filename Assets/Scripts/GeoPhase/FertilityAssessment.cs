@@ -9,7 +9,7 @@ public class FertilityAssessment
     int temperatureSweetSpotMin = 5;
     int temperatureSweetSpotMax = 30;
     int altitudeSweetSpotMin = 0;
-    int altitudeSweetSpotMax = 800;
+    int altitudeSweetSpotMax = 1200;
     int rainfallSweetSpotMin = 20;
     int rainfallSweetSpotMax = 40;
     int riverWidthSweetSpotMin = 50;

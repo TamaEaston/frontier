@@ -12,7 +12,7 @@ public class RiverFlow
     private const float MIN_RIVER_WIDTH_FOR_CONFLUENCE = 15f;
     private const float EROSION_RATE_NORMAL = 0.5f;
     private const float EROSION_RATE_GLACIAL = 1.0f;
-    private const float SEDIMENT_DEPOSITION_RATE = 0.3f;
+    private const float SEDIMENT_DEPOSITION_RATE = 1.0f;
     private const int MAX_ITERATIONS = 3;
 
     public RiverFlow(HexGrid hexGrid, float seaLevel)
