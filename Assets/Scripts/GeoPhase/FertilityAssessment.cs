@@ -6,7 +6,7 @@ using UnityEngine;
 public class FertilityAssessment
 {
     private HexGrid hexGrid;
-    int temperatureSweetSpotMin = 10;
+    int temperatureSweetSpotMin = 5;
     int temperatureSweetSpotMax = 30;
     int altitudeSweetSpotMin = 0;
     int altitudeSweetSpotMax = 800;
