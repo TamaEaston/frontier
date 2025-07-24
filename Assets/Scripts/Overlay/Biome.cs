@@ -11,6 +11,10 @@ public class Biome
     public Range Temperature;
     public Range Rainfall;
     public Range SurfaceWater;
+    public Range Terrain;
+    public Range VolcanicActivity;
+    public Range WindIntensity;
+    public bool NearOcean;
 }
 
 [System.Serializable]

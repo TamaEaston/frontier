@@ -1,45 +1,53 @@
 {
     "biomes": [
         {
-            "Name": "Swamp",
-            "Image": "Tiles/swamp-color.png",
-            "Colour": "#2E7D32",
+            "Name": "Ice Sheet",
+            "Image": "Tiles/ice-flow-color.png",
+            "Colour": "#E8F4FD",
             "HeightAboveSeaLevel": {
-                "Min": 1,
-                "Max": 100
+                "Min": -500,
+                "Max": 3000
             },
             "Temperature": {
-                "Min": 10,
-                "Max": 50
+                "Min": -50,
+                "Max": -10
             },
             "Rainfall": {
-                "Min": 30,
+                "Min": 0,
                 "Max": 100
             },
             "SurfaceWater": {
-                "Min": 100,
+                "Min": 0,
                 "Max": 9999
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 4
             }
         },
         {
-            "Name": "Sandy Desert",
-            "Image": "Tiles/sand-dunes-color.png",
-            "Colour": "#EDC9AF",
+            "Name": "Alpine Tundra",
+            "Image": "Tiles/mountains-snowcapped-color.png",
+            "Colour": "#D4E6F1",
             "HeightAboveSeaLevel": {
-                "Min": 1,
-                "Max": 1000
+                "Min": 2000,
+                "Max": 4000
             },
             "Temperature": {
-                "Min": 30,
-                "Max": 99
+                "Min": -15,
+                "Max": 5
             },
             "Rainfall": {
-                "Min": 0,
-                "Max": 10
+                "Min": 10,
+                "Max": 40
             },
             "SurfaceWater": {
                 "Min": 0,
-                "Max": 0
+                "Max": 100
+            },
+            "Terrain": {
+                "Min": 3,
+                "Max": 4
             }
         },
         {
@@ -52,15 +60,19 @@
             },
             "Temperature": {
                 "Min": -5,
-                "Max": 10
+                "Max": 15
             },
             "Rainfall": {
-                "Min": 10,
-                "Max": 50
+                "Min": 15,
+                "Max": 40
             },
             "SurfaceWater": {
                 "Min": 0,
                 "Max": 100
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 3
             }
         },
         {
@@ -69,18 +81,636 @@
             "Colour": "#7AAD43",
             "HeightAboveSeaLevel": {
                 "Min": 1,
-                "Max": 1000
+                "Max": 800
             },
             "Temperature": {
-                "Min": 10,
-                "Max": 30
+                "Min": 5,
+                "Max": 25
             },
             "Rainfall": {
-                "Min": 10,
+                "Min": 20,
                 "Max": 50
             },
             "SurfaceWater": {
                 "Min": 0,
+                "Max": 100
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Tropical Forest",
+            "Image": "Tiles/forest-tropical-color.png",
+            "Colour": "#228B22",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 500
+            },
+            "Temperature": {
+                "Min": 20,
+                "Max": 35
+            },
+            "Rainfall": {
+                "Min": 40,
+                "Max": 80
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 200
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Shrubland",
+            "Image": "Tiles/shrubland-color.png",
+            "Colour": "#9ACD32",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 1200
+            },
+            "Temperature": {
+                "Min": 10,
+                "Max": 35
+            },
+            "Rainfall": {
+                "Min": 10,
+                "Max": 30
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 50
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Sandy Desert",
+            "Image": "Tiles/sand-dunes-color.png",
+            "Colour": "#EDC9AF",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 1000
+            },
+            "Temperature": {
+                "Min": 25,
+                "Max": 50
+            },
+            "Rainfall": {
+                "Min": 0,
+                "Max": 15
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 25
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Cold Desert",
+            "Image": "Tiles/rocky-desert-color.png",
+            "Colour": "#D2B48C",
+            "HeightAboveSeaLevel": {
+                "Min": 500,
+                "Max": 2000
+            },
+            "Temperature": {
+                "Min": -5,
+                "Max": 25
+            },
+            "Rainfall": {
+                "Min": 0,
+                "Max": 20
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 25
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Cactus Scrubland",
+            "Image": "Tiles/cactus-heavy.png",
+            "Colour": "#8FBC8F",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 1000
+            },
+            "Temperature": {
+                "Min": 15,
+                "Max": 40
+            },
+            "Rainfall": {
+                "Min": 5,
+                "Max": 20
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 30
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Shrub Hills",
+            "Image": "Tiles/shrub-hills-color.png",
+            "Colour": "#A0522D",
+            "HeightAboveSeaLevel": {
+                "Min": 200,
+                "Max": 1200
+            },
+            "Temperature": {
+                "Min": 5,
+                "Max": 30
+            },
+            "Rainfall": {
+                "Min": 15,
+                "Max": 35
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 75
+            },
+            "Terrain": {
+                "Min": 2,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Shrub Mountains",
+            "Image": "Tiles/shrub-mountains-b-color.png",
+            "Colour": "#8B7355",
+            "HeightAboveSeaLevel": {
+                "Min": 800,
+                "Max": 2200
+            },
+            "Temperature": {
+                "Min": -5,
+                "Max": 25
+            },
+            "Rainfall": {
+                "Min": 15,
+                "Max": 40
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 100
+            },
+            "Terrain": {
+                "Min": 3,
+                "Max": 4
+            }
+        },
+        {
+            "Name": "Badlands",
+            "Image": "Tiles/badlands-1-a.png",
+            "Colour": "#CD853F",
+            "HeightAboveSeaLevel": {
+                "Min": 200,
+                "Max": 1500
+            },
+            "Temperature": {
+                "Min": 5,
+                "Max": 40
+            },
+            "Rainfall": {
+                "Min": 5,
+                "Max": 25
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 25
+            },
+            "Terrain": {
+                "Min": 3,
+                "Max": 4
+            }
+        },
+        {
+            "Name": "Coniferous Hills",
+            "Image": "Tiles/hills-forested-conifer-a-matched.png",
+            "Colour": "#2F4F2F",
+            "HeightAboveSeaLevel": {
+                "Min": 200,
+                "Max": 1500
+            },
+            "Temperature": {
+                "Min": -5,
+                "Max": 15
+            },
+            "Rainfall": {
+                "Min": 20,
+                "Max": 50
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 100
+            },
+            "Terrain": {
+                "Min": 2,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Deciduous Hills",
+            "Image": "Tiles/hills-forested-deciduous-a-matched.png",
+            "Colour": "#90EE90",
+            "HeightAboveSeaLevel": {
+                "Min": 200,
+                "Max": 1200
+            },
+            "Temperature": {
+                "Min": 5,
+                "Max": 25
+            },
+            "Rainfall": {
+                "Min": 20,
+                "Max": 50
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 100
+            },
+            "Terrain": {
+                "Min": 2,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Tropical Hills",
+            "Image": "Tiles/hills-forested-tropical-a-matched.png",
+            "Colour": "#32CD32",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 1000
+            },
+            "Temperature": {
+                "Min": 20,
+                "Max": 35
+            },
+            "Rainfall": {
+                "Min": 30,
+                "Max": 70
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 150
+            },
+            "Terrain": {
+                "Min": 2,
+                "Max": 3
+            }
+        },
+        {
+            "Name": "Forested Mountains",
+            "Image": "Tiles/mountains-forested-conifer-a-matched.png",
+            "Colour": "#006400",
+            "HeightAboveSeaLevel": {
+                "Min": 1000,
+                "Max": 2500
+            },
+            "Temperature": {
+                "Min": -10,
+                "Max": 15
+            },
+            "Rainfall": {
+                "Min": 25,
+                "Max": 60
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 100
+            },
+            "Terrain": {
+                "Min": 4,
+                "Max": 4
+            }
+        },
+        {
+            "Name": "Deciduous Mountains",
+            "Image": "Tiles/mountains-forested-deciduous-a-color.png",
+            "Colour": "#8FBC8F",
+            "HeightAboveSeaLevel": {
+                "Min": 800,
+                "Max": 2200
+            },
+            "Temperature": {
+                "Min": 0,
+                "Max": 20
+            },
+            "Rainfall": {
+                "Min": 25,
+                "Max": 60
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 100
+            },
+            "Terrain": {
+                "Min": 4,
+                "Max": 4
+            }
+        },
+        {
+            "Name": "Tropical Mountains",
+            "Image": "Tiles/mountains-forested-tropical-a-matched.png",
+            "Colour": "#228B22",
+            "HeightAboveSeaLevel": {
+                "Min": 1000,
+                "Max": 3000
+            },
+            "Temperature": {
+                "Min": 10,
+                "Max": 25
+            },
+            "Rainfall": {
+                "Min": 40,
+                "Max": 80
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 150
+            },
+            "Terrain": {
+                "Min": 4,
+                "Max": 4
+            }
+        },
+        {
+            "Name": "Rocky Mountains",
+            "Image": "Tiles/mountains-b-color.png",
+            "Colour": "#696969",
+            "HeightAboveSeaLevel": {
+                "Min": 2000,
+                "Max": 4000
+            },
+            "Temperature": {
+                "Min": -15,
+                "Max": 10
+            },
+            "Rainfall": {
+                "Min": 0,
+                "Max": 100
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 50
+            },
+            "Terrain": {
+                "Min": 4,
+                "Max": 4
+            }
+        },
+        {
+            "Name": "Snowy Mountains",
+            "Image": "Tiles/mountains-snowcapped-color.png",
+            "Colour": "#FFFAFA",
+            "HeightAboveSeaLevel": {
+                "Min": 1500,
+                "Max": 4000
+            },
+            "Temperature": {
+                "Min": -20,
+                "Max": 5
+            },
+            "Rainfall": {
+                "Min": 20,
+                "Max": 80
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 100
+            },
+            "Terrain": {
+                "Min": 4,
+                "Max": 4
+            }
+        },
+        {
+            "Name": "Swamp",
+            "Image": "Tiles/swamp-color.png",
+            "Colour": "#2E7D32",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 50
+            },
+            "Temperature": {
+                "Min": 10,
+                "Max": 35
+            },
+            "Rainfall": {
+                "Min": 30,
+                "Max": 80
+            },
+            "SurfaceWater": {
+                "Min": 150,
+                "Max": 400
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 1
+            }
+        },
+        {
+            "Name": "Volcanic Active",
+            "Image": "Tiles/volcanic-a-color.png",
+            "Colour": "#DC143C",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 3000
+            },
+            "Temperature": {
+                "Min": -10,
+                "Max": 99
+            },
+            "Rainfall": {
+                "Min": 0,
+                "Max": 100
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 25
+            },
+            "Terrain": {
+                "Min": 3,
+                "Max": 4
+            },
+            "VolcanicActivity": {
+                "Min": 70,
+                "Max": 100
+            }
+        },
+        {
+            "Name": "Volcanic Dormant",
+            "Image": "Tiles/volcanic-dormant-color.png",
+            "Colour": "#8B4513",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 2000
+            },
+            "Temperature": {
+                "Min": 5,
+                "Max": 35
+            },
+            "Rainfall": {
+                "Min": 10,
+                "Max": 60
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 100
+            },
+            "Terrain": {
+                "Min": 2,
+                "Max": 4
+            },
+            "VolcanicActivity": {
+                "Min": 20,
+                "Max": 70
+            }
+        },
+        {
+            "Name": "Dead Forest",
+            "Image": "Tiles/deadforest-hills-color.png",
+            "Colour": "#2F2F2F",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 1500
+            },
+            "Temperature": {
+                "Min": -10,
+                "Max": 50
+            },
+            "Rainfall": {
+                "Min": 0,
+                "Max": 40
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 50
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 4
+            }
+        },
+        {
+            "Name": "Ocean",
+            "Image": "",
+            "Colour": "#003366",
+            "HeightAboveSeaLevel": {
+                "Min": -2000,
+                "Max": -30
+            },
+            "Temperature": {
+                "Min": -5,
+                "Max": 35
+            },
+            "Rainfall": {
+                "Min": 0,
+                "Max": 0
+            },
+            "SurfaceWater": {
+                "Min": 500,
+                "Max": 9999
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 4
+            }
+        },
+        {
+            "Name": "Coastal Kelp Forest",
+            "Image": "Tiles/kelp-a-color.png",
+            "Colour": "#006A6B",
+            "HeightAboveSeaLevel": {
+                "Min": -30,
+                "Max": -2
+            },
+            "Temperature": {
+                "Min": 5,
+                "Max": 20
+            },
+            "Rainfall": {
+                "Min": 0,
+                "Max": 0
+            },
+            "SurfaceWater": {
+                "Min": 500,
+                "Max": 9999
+            },
+            "Terrain": {
+                "Min": 2,
+                "Max": 4
+            },
+            "NearOcean": true
+        },
+        {
+            "Name": "Rocky Shore",
+            "Image": "Tiles/kelp-roc-color.png",
+            "Colour": "#708090",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 20
+            },
+            "Temperature": {
+                "Min": 5,
+                "Max": 25
+            },
+            "Rainfall": {
+                "Min": 20,
+                "Max": 80
+            },
+            "SurfaceWater": {
+                "Min": 100,
+                "Max": 300
+            },
+            "Terrain": {
+                "Min": 2,
+                "Max": 4
+            },
+            "NearOcean": true
+        },
+        {
+            "Name": "Stormy Temperate",
+            "Image": "Tiles/stormy-a-color.png",
+            "Colour": "#4682B4",
+            "HeightAboveSeaLevel": {
+                "Min": 1,
+                "Max": 1000
+            },
+            "Temperature": {
+                "Min": 5,
+                "Max": 25
+            },
+            "Rainfall": {
+                "Min": 40,
+                "Max": 80
+            },
+            "SurfaceWater": {
+                "Min": 0,
+                "Max": 200
+            },
+            "Terrain": {
+                "Min": 1,
+                "Max": 3
+            },
+            "WindIntensity": {
+                "Min": 70,
                 "Max": 100
             }
         }
