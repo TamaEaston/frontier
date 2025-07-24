@@ -47,7 +47,9 @@ public class SetBiomes
             // Clear existing biome assignment
             hex.Biome = null;
             
-            // Find matching biome
+            // Find matching biome with terrain quartile consideration
+            List<Biome> matchingBiomes = new List<Biome>();
+            
             foreach (var biome in biomes)
             {
                 if (biome.HeightAboveSeaLevel.Min <= hex.HeightAboveSeaLevel &&
@@ -59,12 +61,69 @@ public class SetBiomes
                     biome.SurfaceWater.Min <= hex.SurfaceWater &&
                     hex.SurfaceWater <= biome.SurfaceWater.Max)
                 {
-                    hex.Biome = biome;
-                    // UnityEngine.Debug.Log("Biome set: " + biome.Name);
-                    break;
+                    matchingBiomes.Add(biome);
                 }
+            }
+            
+            // Select best biome based on terrain quartile preferences
+            if (matchingBiomes.Count > 0)
+            {
+                hex.Biome = SelectBiomeByTerrain(matchingBiomes, hex);
             }
         }
 
+    }
+
+    private Biome SelectBiomeByTerrain(List<Biome> matchingBiomes, Hexagon hex)
+    {
+        // Define terrain preferences for different biome types
+        Dictionary<string, int[]> terrainPreferences = new Dictionary<string, int[]>()
+        {
+            // Flat terrain preferred (Q1-Q2)
+            {"Sandy Desert", new int[] {1, 2}},
+            {"Grassland", new int[] {1, 2}},
+            {"Prairie", new int[] {1, 2}},
+            {"Steppe", new int[] {1, 2}},
+            {"Plains", new int[] {1, 2}},
+            {"Savanna", new int[] {1, 2}},
+            {"Farmland", new int[] {1, 2}},
+            {"Agricultural", new int[] {1, 2}},
+            
+            // Rolling terrain preferred (Q2-Q3)
+            {"Forest", new int[] {2, 3}},
+            {"Deciduous Forest", new int[] {2, 3}},
+            {"Boreal Forest", new int[] {2, 3}},
+            {"Woodland", new int[] {2, 3}},
+            {"Hills", new int[] {2, 3}},
+            {"Rolling Hills", new int[] {2, 3}},
+            
+            // Mountainous terrain preferred (Q3-Q4)
+            {"Rocky Desert", new int[] {3, 4}},
+            {"Badlands", new int[] {3, 4}},
+            {"Highland", new int[] {3, 4}},
+            {"Mountain", new int[] {3, 4}},
+            {"Alpine", new int[] {4}},
+            {"Cliff", new int[] {4}},
+            {"Peak", new int[] {4}},
+            
+            // Flat wetlands (Q1)
+            {"Swamp", new int[] {1}},
+            {"Marsh", new int[] {1}},
+            {"Wetland", new int[] {1}},
+            {"Floodplain", new int[] {1}}
+        };
+        
+        // Find biomes that match terrain preferences
+        var preferredBiomes = matchingBiomes.Where(biome => 
+        {
+            if (terrainPreferences.ContainsKey(biome.Name))
+            {
+                return terrainPreferences[biome.Name].Contains(hex.TerrainQuartile);
+            }
+            return true; // If no preference defined, include all biomes
+        }).ToList();
+        
+        // Return preferred biome if available, otherwise fallback to first matching biome
+        return preferredBiomes.Count > 0 ? preferredBiomes[0] : matchingBiomes[0];
     }
 }

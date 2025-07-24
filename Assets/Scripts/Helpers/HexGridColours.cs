@@ -184,5 +184,25 @@ namespace Helpers
             
             return fertilityColor;
         }
+
+        public Color GetTerrainQuartileColour(int terrainQuartile, float altitudeVsSeaLevel)
+        {
+            // Ocean: Keep existing depth gradient
+            if (altitudeVsSeaLevel <= 0)
+            {
+                float t = Mathf.InverseLerp(-10000, 0, altitudeVsSeaLevel);
+                return Color.Lerp(Color.black, new Color(0.4f, 0.7f, 0.8f), t); // Black to Light Sea Blue
+            }
+            
+            // Land: Four distinct terrain quartile colors
+            switch (terrainQuartile)
+            {
+                case 1: return new Color(0.8f, 0.9f, 0.6f, 1f); // Light green (Q1 - Flat/Plains)
+                case 2: return new Color(0.7f, 0.8f, 0.4f, 1f); // Medium green (Q2 - Rolling)  
+                case 3: return new Color(0.6f, 0.5f, 0.3f, 1f); // Brown (Q3 - Hilly)
+                case 4: return new Color(0.4f, 0.3f, 0.2f, 1f); // Dark brown (Q4 - Mountainous)
+                default: return Color.gray; // Fallback
+            }
+        }
     }
 }

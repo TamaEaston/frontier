@@ -38,6 +38,7 @@ public class ViewManager
             RegisterView("Weather", new WeatherView());
             RegisterView("Temperature", new TemperatureView());
             RegisterView("Fertility", new FertilityView());
+            RegisterView("TerrainQuartile", new TerrainQuartileView());
             
             // Set default view
             SetActiveView("None");
@@ -152,6 +153,9 @@ public class ViewManager
                     break;
                 case KeyCode.Alpha6:
                     targetView = "Fertility";
+                    break;
+                case KeyCode.Alpha7:
+                    targetView = "Terrain";
                     break;
             }
             

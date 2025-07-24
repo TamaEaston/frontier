@@ -6,10 +6,10 @@ using UnityEngine;
 public class FertilityAssessment
 {
     private HexGrid hexGrid;
-    int temperatureSweetSpotMin = 5;
-    int temperatureSweetSpotMax = 30;
+    int temperatureSweetSpotMin = 10;
+    int temperatureSweetSpotMax = 20;
     int altitudeSweetSpotMin = 0;
-    int altitudeSweetSpotMax = 1200;
+    int altitudeSweetSpotMax = 800;
     int rainfallSweetSpotMin = 20;
     int rainfallSweetSpotMax = 40;
     int riverWidthSweetSpotMin = 50;
@@ -35,8 +35,8 @@ public class FertilityAssessment
             else
             {
                 // Calculate individual scores (0-10 each)
-                float temperatureScore = CalculateScore(hex.Temperature, temperatureSweetSpotMin, temperatureSweetSpotMax, 2);
-                float altitudeScore = CalculateScore(hex.HeightAboveSeaLevel, altitudeSweetSpotMin, altitudeSweetSpotMax, 2);
+                float temperatureScore = CalculateScore(hex.Temperature, temperatureSweetSpotMin, temperatureSweetSpotMax, 3);
+                float altitudeScore = CalculateScore(hex.HeightAboveSeaLevel, altitudeSweetSpotMin, altitudeSweetSpotMax, 6);
                 float rainfallScore = CalculateScore(hex.Rainfall, rainfallSweetSpotMin, rainfallSweetSpotMax);
                 float riverWidthScore = CalculateScore(hex.RiverWidth, riverWidthSweetSpotMin, riverWidthSweetSpotMax);
                 

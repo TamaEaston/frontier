@@ -32,6 +32,8 @@ public class Hexagon : MonoBehaviour
     public float TemperatureNoWind;
     public float Temperature;
     public float Fertility;
+    public float TerrainRoughness { get; private set; }
+    public int TerrainQuartile { get; private set; }
 
     public Hexagon[] Neighbours = new Hexagon[6];
     public Hexagon[] WindSources = new Hexagon[6];
@@ -65,6 +67,34 @@ public class Hexagon : MonoBehaviour
     }
 
     private bool isClicked = false;
+
+    public void CalculateTerrainRoughness()
+    {
+        if (Neighbours == null) 
+        {
+            TerrainRoughness = 0;
+            return;
+        }
+        
+        float totalDifference = 0;
+        int validNeighbors = 0;
+        
+        foreach (var neighbor in Neighbours)
+        {
+            if (neighbor != null)
+            {
+                totalDifference += Mathf.Abs(Altitude - neighbor.Altitude);
+                validNeighbors++;
+            }
+        }
+        
+        TerrainRoughness = validNeighbors > 0 ? totalDifference / validNeighbors : 0;
+    }
+
+    public void SetTerrainQuartile(int quartile)
+    {
+        TerrainQuartile = quartile;
+    }
 
     private void OnMouseDown()
     {
@@ -112,7 +142,7 @@ public class Hexagon : MonoBehaviour
                 int x = (int)Input.mousePosition.x;
                 int y = (int)(Screen.height - Input.mousePosition.y); // Convert to GUI coordinates
                 string biomeInfo = Biome != null ? Biome.Name : "None";
-                string tooltipText = $"HexagonID: {HexagonID}\nBiome: {biomeInfo}\nPositionX: {PositionX}\nPositionY: {PositionY}\nAltitude: {Altitude}\nAltitudeChange: {AltitudeChange}\nHeightAboveSeaLevel: {HeightAboveSeaLevel}\nAltitudeVsSeaLevel: {AltitudeVsSeaLevel}\nMagmaIntensity: {MagmaIntensity}\nMagmaDirection: {MagmaDirection}\nWindIntensity: {WindIntensity}\nWindChange: {WindChange}\nWindDirection: {WindDirection}\nEvaporation: {Evaporation}\nWaterVapour: {WaterVapour}\nRainfall: {Rainfall}\nSurfaceWater: {SurfaceWater}\nSurfaceWaterNew: {SurfaceWaterNew}\nRiverWidth: {RiverWidth}\nSolarIntensity: {SolarIntensity}\nTemperatureNoWind: {TemperatureNoWind}\nTemperature: {Temperature}\nFertility: {Fertility:F1}";
+                string tooltipText = $"HexagonID: {HexagonID}\nBiome: {biomeInfo}\nPositionX: {PositionX}\nPositionY: {PositionY}\nAltitude: {Altitude}\nAltitudeChange: {AltitudeChange}\nHeightAboveSeaLevel: {HeightAboveSeaLevel}\nAltitudeVsSeaLevel: {AltitudeVsSeaLevel}\nMagmaIntensity: {MagmaIntensity}\nMagmaDirection: {MagmaDirection}\nWindIntensity: {WindIntensity}\nWindChange: {WindChange}\nWindDirection: {WindDirection}\nEvaporation: {Evaporation}\nWaterVapour: {WaterVapour}\nRainfall: {Rainfall}\nSurfaceWater: {SurfaceWater}\nSurfaceWaterNew: {SurfaceWaterNew}\nRiverWidth: {RiverWidth}\nSolarIntensity: {SolarIntensity}\nTemperatureNoWind: {TemperatureNoWind}\nTemperature: {Temperature}\nFertility: {Fertility:F1}\nTerrainRoughness: {TerrainRoughness:F1}\nTerrainQuartile: {TerrainQuartile}";
 
                 // Output all hexagon values to console
                 UnityEngine.Debug.Log($"Hexagon Clicked - {tooltipText.Replace("\n", " | ")}");

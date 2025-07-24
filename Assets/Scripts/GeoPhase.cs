@@ -26,6 +26,12 @@ public class GeoPhase
         fertilityAssessment.Execute();
     }
 
+    public void ExecuteTerrainAnalysis()
+    {
+        TerrainAnalysis terrainAnalysis = new TerrainAnalysis(hexGrid);
+        terrainAnalysis.Execute();
+    }
+
     public void ExecuteMagmaImpact()
     {
         MagmaImpact magmaImpact = new MagmaImpact(hexGrid);

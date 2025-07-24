@@ -178,6 +178,7 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteFertilityAssessment();
             phase.ExecuteWindEffect();
             phase.ExecuteRiverFlow();
+            phase.ExecuteTerrainAnalysis();
         }
         UnityEngine.Debug.Log("Time taken for " + NumberOfGeoPhases + " GeoPhases : " + stopwatch.ElapsedMilliseconds + " ms. Average: " + stopwatch.ElapsedMilliseconds / NumberOfGeoPhases + " ms");
         GenesisSeaLevel = SeaLevel;
@@ -218,6 +219,7 @@ public class HexGrid : MonoBehaviour
                 phase.ExecuteSeaLevel();
                 phase.ExecuteWindEffect();
                 phase.ExecuteRiverFlow();
+                phase.ExecuteTerrainAnalysis();
                 phase.ExecuteSetBiomes();
                 phase.ExecuteEdgeGuard();
                 
@@ -276,6 +278,10 @@ public class HexGrid : MonoBehaviour
             else if (Input.GetKeyDown(KeyCode.Alpha6))
             {
                 viewManager.HandleViewInput(KeyCode.Alpha6);
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha7))
+            {
+                viewManager.HandleViewInput(KeyCode.Alpha7);
             }
 
         }
@@ -362,6 +368,7 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteFertilityAssessment();
             phase.ExecuteWindEffect();
             phase.ExecuteRiverFlow();
+            phase.ExecuteTerrainAnalysis();
             phase.ExecuteSetBiomes();
             phase.ExecuteEdgeGuard();
         }
@@ -583,6 +590,7 @@ public class HexGrid : MonoBehaviour
             phase.ExecuteSeaLevel();
             phase.ExecuteWindEffect();
             phase.ExecuteRiverFlow();
+            phase.ExecuteTerrainAnalysis();
         }
         stopwatch.Stop();
         UnityEngine.Debug.Log($"Map regenerated with {NumberOfGeoPhases} initial cycles in {stopwatch.ElapsedMilliseconds} ms");
