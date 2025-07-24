@@ -85,7 +85,7 @@ public class FertilityView : IHexagonView
         {
             if (hexagon.RiverWidth > 0 && hexagon.LowestNeighbour != null && hexagon.AltitudeVsSeaLevel > 0)
             {
-                Color riverColour = (hexagon.Temperature < -5) ? new Color(0.6f, 0.8f, 1.0f) : new Color(0.0f, 0.5f, 0.5f);
+                Color riverColour = colorHelper.GetStandardRiverColour(hexagon.Temperature);
                 
                 Vector3 startPos = new Vector3(hexagon.transform.position.x, hexagon.transform.position.y, -1);
                 Vector3 endPos = new Vector3(hexagon.LowestNeighbour.transform.position.x, hexagon.LowestNeighbour.transform.position.y, -1);

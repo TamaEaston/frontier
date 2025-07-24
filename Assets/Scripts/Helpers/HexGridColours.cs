@@ -55,93 +55,67 @@ namespace Helpers
 
         public Color GetAltitudeColour(float heightAboveSeaLevel, float SurfaceWater, float Temperature)
         {
-            if (heightAboveSeaLevel < 0)
+            // Use standardized water colors first
+            Color waterColor = GetStandardWaterColour(heightAboveSeaLevel, SurfaceWater, Temperature);
+            if (waterColor != Color.clear)
             {
-                float t = Mathf.InverseLerp(-10000, 0, heightAboveSeaLevel);
-                return Color.Lerp(Color.black, new Color(0.4f, 0.7f, 0.8f), t); // Black to Light Sea Blue
+                return waterColor;
             }
-            else if (SurfaceWater >= 100)
-            {
-                if (Temperature > -5)
-                {
-                    return new Color(0.0f, 0.5f, 0.5f);
-                }
-                else
-                {
-                    return new Color(0.6f, 0.8f, 1.0f); // Light Blue
-                }
-            }
-            else
-            {
-                float t = Mathf.InverseLerp(0, 10000, heightAboveSeaLevel);
-                return Color.Lerp(new Color(0.13f, 0.55f, 0.13f), Color.white, t); // Forest Green to White
-            }
+            
+            // Altitude gradient for land
+            float t = Mathf.InverseLerp(0, 10000, heightAboveSeaLevel);
+            return Color.Lerp(new Color(0.13f, 0.55f, 0.13f), Color.white, t); // Forest Green to White
         }
 
-        public Color GetRainfallColour(float heightAboveSeaLevel, float SurfaceWater, float Rainfall)
+        public Color GetRainfallColour(float heightAboveSeaLevel, float SurfaceWater, float Rainfall, float Temperature)
         {
-            if (heightAboveSeaLevel < 0)
+            // Use standardized water colors first  
+            Color waterColor = GetStandardWaterColour(heightAboveSeaLevel, SurfaceWater, Temperature);
+            if (waterColor != Color.clear)
             {
-                float t = Mathf.InverseLerp(-10000, 0, heightAboveSeaLevel);
-                return Color.Lerp(new Color(0, 0, 0.5f), new Color(0.4f, 0.7f, 0.8f), t); // Dark Blue to Light Sea Blue
+                return waterColor;
             }
-            else if (SurfaceWater >= 100)
-            {
-                return new Color(0.0f, 0.5f, 0.5f);
-            }
-            else
-            {
-                float t = Mathf.InverseLerp(0, 50, Rainfall);
-                return Color.Lerp(Color.yellow, new Color(0, 0.39f, 0), t); // Yellow to Dark Green
-            }
+            
+            // Rainfall gradient for land
+            float t = Mathf.InverseLerp(0, 50, Rainfall);
+            return Color.Lerp(Color.yellow, new Color(0, 0.39f, 0), t); // Yellow to Dark Green
         }
 
         public Color GetTemperatureColour(float heightAboveSeaLevel, float SurfaceWater, float Temperature)
         {
-            if (heightAboveSeaLevel < 0)
+            // Use standardized water colors first
+            Color waterColor = GetStandardWaterColour(heightAboveSeaLevel, SurfaceWater, Temperature);
+            if (waterColor != Color.clear)
             {
-                float t = Mathf.InverseLerp(-40, 40, Temperature);
-                return Color.Lerp(new Color(0.9f, 0.9f, 1f), new Color(0, 0, 0.5f), t); // Icy Blue Tint to Dark Blue
+                return waterColor;
             }
-            else if (SurfaceWater >= 100)
+            
+            // Temperature gradient for land
+            float t;
+            Color startColour, endColour;
+
+            if (Temperature >= 0 && Temperature <= 20)
             {
-                if (Temperature > -5)
-                {
-                    return new Color(0.0f, 0.5f, 0.5f);
-                }
-                else
-                {
-                    return new Color(0.6f, 0.8f, 1.0f); // Light Blue
-                }
+                // For temperatures between 0 and 20, range from light green to dark green
+                t = Mathf.InverseLerp(0, 20, Temperature);
+                startColour = new Color(0.56f, 0.93f, 0.56f); // Light Green
+                endColour = new Color(0.0f, 0.5f, 0.0f); // Dark Green
+            }
+            else if (Temperature > 20)
+            {
+                t = Mathf.InverseLerp(20, 35, Temperature);
+                startColour = new Color(0.0f, 0.5f, 0.0f); // Dark Green
+                endColour = new Color(1.0f, 0.5f, 0.0f); // Orange
             }
             else
             {
-                float t;
-                Color startColour, endColour;
-
-                if (Temperature >= 0 && Temperature <= 20)
-                {
-                    // For temperatures between 0 and 20, range from light green to dark green
-                    t = Mathf.InverseLerp(0, 20, Temperature);
-                    startColour = new Color(0.56f, 0.93f, 0.56f); // Light Green
-                    endColour = new Color(0.0f, 0.5f, 0.0f); // Dark Green
-                }
-                else if (Temperature > 20)
-                {
-                    t = Mathf.InverseLerp(20, 35, Temperature);
-                    startColour = new Color(0.0f, 0.5f, 0.0f); // Dark Green
-                    endColour = new Color(1.0f, 0.5f, 0.0f); // Orange
-                }
-                else
-                {
-                    // For other temperatures, range from white to red
-                    t = Mathf.InverseLerp(-35, 0, Temperature);
-                    startColour = Color.white;
-                    endColour = new Color(0.56f, 0.93f, 0.56f); // Light Green
-                }
-
-                return Color.Lerp(startColour, endColour, t);
+                // For other temperatures, range from white to red
+                t = Mathf.InverseLerp(-35, 0, Temperature);
+                startColour = Color.white;
+                endColour = new Color(0.56f, 0.93f, 0.56f); // Light Green
             }
+
+            return Color.Lerp(startColour, endColour, t);
         }
 
         public Color GetMagmaColour(float magmaIntensity)
@@ -185,13 +159,63 @@ namespace Helpers
             return fertilityColor;
         }
 
-        public Color GetTerrainQuartileColour(int terrainQuartile, float altitudeVsSeaLevel)
+        /// <summary>
+        /// Get standardized water colors for Rivers, Lakes, Glaciers & Frozen Lakes
+        /// Used consistently across all views to match Biome view standards
+        /// </summary>
+        public Color GetStandardWaterColour(float heightAboveSeaLevel, float surfaceWater, float temperature)
         {
-            // Ocean: Keep existing depth gradient
-            if (altitudeVsSeaLevel <= 0)
+            // Ocean/Sea (below sea level)
+            if (heightAboveSeaLevel < 0)
             {
-                float t = Mathf.InverseLerp(-10000, 0, altitudeVsSeaLevel);
-                return Color.Lerp(Color.black, new Color(0.4f, 0.7f, 0.8f), t); // Black to Light Sea Blue
+                if (temperature > -10)
+                {
+                    float t = Mathf.InverseLerp(-10000, 0, heightAboveSeaLevel);
+                    return Color.Lerp(new Color(0, 0, 0.5f), new Color(0.4f, 0.7f, 0.8f), t); // Dark Blue to Light Sea Blue
+                }
+                else
+                {
+                    return new Color(0.9f, 0.9f, 1.0f); // Very Light Blue (Frozen Ocean)
+                }
+            }
+            // Lakes (surface water >= 100 on land)
+            else if (surfaceWater >= 100)
+            {
+                if (temperature > -5)
+                {
+                    return new Color(0.0f, 0.5f, 0.5f); // Teal (Lakes)
+                }
+                else
+                {
+                    return new Color(0.6f, 0.8f, 1.0f); // Light Blue (Frozen Lakes)
+                }
+            }
+            // Glaciers (land with temperature < -5, but no surface water)
+            else if (temperature < -5)
+            {
+                float t = Mathf.InverseLerp(0, 5000, heightAboveSeaLevel);
+                return Color.Lerp(new Color(0.9f, 0.9f, 0.9f), Color.white, t); // Light Grey to White (Glaciers)
+            }
+            
+            // Not a water feature - return transparent to indicate no water color needed
+            return Color.clear;
+        }
+
+        /// <summary>
+        /// Get standardized river colors based on temperature
+        /// </summary>
+        public Color GetStandardRiverColour(float temperature)
+        {
+            return (temperature < -5) ? new Color(0.6f, 0.8f, 1.0f) : new Color(0.0f, 0.5f, 0.5f);
+        }
+
+        public Color GetTerrainQuartileColour(int terrainQuartile, float altitudeVsSeaLevel, float surfaceWater, float temperature)
+        {
+            // Use standardized water colors first
+            Color waterColor = GetStandardWaterColour(altitudeVsSeaLevel, surfaceWater, temperature);
+            if (waterColor != Color.clear)
+            {
+                return waterColor;
             }
             
             // Land: Four distinct terrain quartile colors

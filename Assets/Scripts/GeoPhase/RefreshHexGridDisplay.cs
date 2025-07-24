@@ -41,7 +41,7 @@ public class RefreshHexGridDisplay
                 }
                 else if (GameSettings.ActiveOverlay == "Weather")
                 {
-                    altitudeColour = hexGrid.colours.GetRainfallColour(hex.AltitudeVsSeaLevel, (float)hex.SurfaceWater, (float)hex.Rainfall);
+                    altitudeColour = hexGrid.colours.GetRainfallColour(hex.AltitudeVsSeaLevel, (float)hex.SurfaceWater, (float)hex.Rainfall, (float)hex.Temperature);
                 }
                 else if (GameSettings.ActiveOverlay == "Temperature")
                 {

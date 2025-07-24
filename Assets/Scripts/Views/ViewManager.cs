@@ -38,7 +38,7 @@ public class ViewManager
             RegisterView("Weather", new WeatherView());
             RegisterView("Temperature", new TemperatureView());
             RegisterView("Fertility", new FertilityView());
-            RegisterView("TerrainQuartile", new TerrainQuartileView());
+            RegisterView("Terrain", new TerrainQuartileView());
             
             // Set default view
             SetActiveView("None");

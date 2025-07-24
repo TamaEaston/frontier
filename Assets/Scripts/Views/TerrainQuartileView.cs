@@ -10,7 +10,7 @@ public class TerrainQuartileView : IHexagonView
     private HexGrid hexGrid;
     private HexGridColours colorHelper;
     
-    public string ViewName => "TerrainQuartile";
+    public string ViewName => "Terrain";
     
     public void Initialize(HexGrid hexGrid)
     {
@@ -40,29 +40,31 @@ public class TerrainQuartileView : IHexagonView
     
     public void OnViewActivated()
     {
-        Debug.Log("Terrain Quartile view activated - showing terrain roughness and river systems");
+        Debug.Log("Terrain view activated - showing terrain roughness, lakes, and river systems");
     }
     
     public void OnViewDeactivated()
     {
-        Debug.Log("Terrain Quartile view deactivated");
+        Debug.Log("Terrain view deactivated");
     }
     
     public Color GetHexagonColor(Hexagon hexagon)
     {
         if (hexagon == null) return Color.white;
         
-        // Use dedicated terrain quartile color calculation
+        // Use dedicated terrain quartile color calculation with lake support
         return colorHelper.GetTerrainQuartileColour(
             hexagon.TerrainQuartile, 
-            hexagon.AltitudeVsSeaLevel
+            hexagon.AltitudeVsSeaLevel,
+            hexagon.SurfaceWater,
+            hexagon.Temperature
         );
     }
     
     public bool ShouldShowOverlay(Hexagon hexagon)
     {
-        // Show overlay only for hexagons with rivers to keep the view clean
-        return hexagon != null && hexagon.RiverWidth > 0;
+        // Show overlay for hexagons with rivers or lakes
+        return hexagon != null && (hexagon.RiverWidth > 0 || hexagon.SurfaceWater >= 100);
     }
     
     /// <summary>
@@ -74,8 +76,8 @@ public class TerrainQuartileView : IHexagonView
         // Only render rivers on land with significant width
         if (hexagon.RiverWidth > 0 && hexagon.LowestNeighbour != null && hexagon.AltitudeVsSeaLevel > 0)
         {
-            // Enhanced river color for better visibility on terrain quartiles
-            Color riverColour = new Color(0.2f, 0.4f, 0.9f, 1f); // Bright blue for visibility
+            // Use standardized river colors consistent with other views
+            Color riverColour = colorHelper.GetStandardRiverColour(hexagon.Temperature);
             
             Vector3 startPos = new Vector3(hexagon.transform.position.x, hexagon.transform.position.y, -1);
             Vector3 endPos = new Vector3(hexagon.LowestNeighbour.transform.position.x, hexagon.LowestNeighbour.transform.position.y, -1);
