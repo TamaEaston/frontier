@@ -28,7 +28,16 @@ public class SetBiomes
         // Process each hexagon with priority-based biome assignment
         foreach (var hex in allHexagons)
         {
-            hex.Biome = SelectBiomeWithPriority(hex);
+            // Skip biome assignment for lakes only - they should be handled by water color system
+            // Ocean tiles (HeightAboveSeaLevel <= 0) should get Ocean biome assignment
+            if (hex.HeightAboveSeaLevel > 0 && hex.SurfaceWater >= 100)
+            {
+                hex.Biome = null; // No biome for lakes - will be handled by standardized water colors
+            }
+            else
+            {
+                hex.Biome = SelectBiomeWithPriority(hex);
+            }
         }
 
         LogBiomeDistribution(allHexagons);
@@ -39,30 +48,21 @@ public class SetBiomes
     /// </summary>
     private Biome SelectBiomeWithPriority(Hexagon hex)
     {
-        // Priority 1: Deep Ocean
-        if (hex.HeightAboveSeaLevel < -30)
+        // Priority 1: Ocean (EXCLUSIVE - any tile at or below sea level is ocean)
+        if (hex.HeightAboveSeaLevel <= 0)
         {
-            return GetBiomeByName("Ocean") ?? GetFallbackBiome(hex);
+            var oceanBiome = GetBiomeByName("Ocean");
+            if (oceanBiome != null) return oceanBiome;
+            
+            // If Ocean biome not found, create a fallback ocean-appropriate biome
+            UnityEngine.Debug.LogWarning("Ocean biome not found in biomes.json!");
+            return GetFallbackBiome(hex);
         }
 
-        // Priority 2: Dense Kelp Forest (Rocky underwater areas near coast)
-        if (hex.AltitudeVsSeaLevel >= -30 && hex.AltitudeVsSeaLevel <= -5 && 
-            IsNearOcean(hex) && hex.TerrainQuartile >= 3)
-        {
-            var kelpBiome = GetBiomeByName("Coastal Kelp Forest");
-            if (kelpBiome != null && MatchesBiomeConditions(hex, kelpBiome))
-                return kelpBiome;
-        }
+        // Note: Since HeightAboveSeaLevel <= 0 is always Ocean, kelp forests and other underwater biomes
+        // are now handled exclusively through the Ocean biome. This simplifies the system.
 
-        // Priority 3: Shallow Coastal Kelp (Rocky coastal waters)
-        if (hex.AltitudeVsSeaLevel >= -30 && hex.AltitudeVsSeaLevel <= -2 && IsNearOcean(hex))
-        {
-            var coastalKelp = GetBiomeByName("Coastal Kelp Forest");
-            if (coastalKelp != null && MatchesBiomeConditions(hex, coastalKelp))
-                return coastalKelp;
-        }
-
-        // Priority 4: Ice Sheet (Temperature override)
+        // Priority 2: Ice Sheet (Temperature override on land)
         if (hex.Temperature < -10)
         {
             var iceSheet = GetBiomeByName("Ice Sheet");  
@@ -70,7 +70,7 @@ public class SetBiomes
                 return iceSheet;
         }
 
-        // Priority 5: Volcanic (Activity override)
+        // Priority 3: Volcanic (Activity override on land)
         if (hex.VolcanicActivity > 70)
         {
             var volcanicActive = GetBiomeByName("Volcanic Active");
@@ -84,7 +84,7 @@ public class SetBiomes
                 return volcanicDormant;
         }
 
-        // Priority 6: Swamp (High surface water on low land)
+        // Priority 4: Swamp (High surface water on low land)
         if (hex.SurfaceWater > 150 && hex.HeightAboveSeaLevel < 50)
         {
             var swamp = GetBiomeByName("Swamp");
@@ -92,7 +92,7 @@ public class SetBiomes
                 return swamp;
         }
 
-        // Priority 7: High altitude + mountainous terrain
+        // Priority 5: High altitude + mountainous terrain
         if (hex.HeightAboveSeaLevel > 2000 && hex.TerrainQuartile == 4)
         {
             var mountainBiomes = new[] { "Alpine Tundra", "Snowy Mountains", "Rocky Mountains", "Forested Mountains" };
@@ -104,7 +104,7 @@ public class SetBiomes
             }
         }
 
-        // Priority 8: Desert conditions (Low rainfall)
+        // Priority 6: Desert conditions (Low rainfall)
         if (hex.Rainfall < 15)
         {
             var desertBiomes = new[] { "Sandy Desert", "Cold Desert", "Cactus Scrubland" };
@@ -116,7 +116,7 @@ public class SetBiomes
             }
         }
 
-        // Priority 9: Coastal areas
+        // Priority 7: Coastal areas (land near ocean)
         if (IsNearOcean(hex))
         {
             var coastalBiome = GetBiomeByName("Rocky Shore");
@@ -124,15 +124,7 @@ public class SetBiomes
                 return coastalBiome;
         }
 
-        // Priority 10: High wind areas
-        if (hex.WindIntensity > 70)
-        {
-            var stormyBiome = GetBiomeByName("Stormy Temperate");
-            if (stormyBiome != null && MatchesBiomeConditions(hex, stormyBiome))
-                return stormyBiome;
-        }
-
-        // Priority 11: General terrain-climate combination
+        // Priority 8: General terrain-climate combination
         return GetBestBiomeMatch(hex);
     }
 
@@ -172,6 +164,12 @@ public class SetBiomes
 
         foreach (var biome in biomes)
         {
+            // Skip Ocean biome in general matching (should be handled by priority system)
+            if (biome.Name == "Ocean") continue;
+            
+            // Skip biomes that are completely incompatible with basic hex properties
+            if (!IsBasicallyCompatible(hex, biome)) continue;
+            
             float score = CalculateBiomeScore(hex, biome);
             if (score > bestScore)
             {
@@ -181,6 +179,22 @@ public class SetBiomes
         }
 
         return bestBiome ?? GetFallbackBiome(hex);
+    }
+
+    /// <summary>
+    /// Check if hex is basically compatible with biome (prevents major mismatches)
+    /// </summary>
+    private bool IsBasicallyCompatible(Hexagon hex, Biome biome)
+    {
+        // Don't assign land biomes to ocean (HeightAboveSeaLevel <= 0 is always ocean)
+        if (hex.HeightAboveSeaLevel <= 0 && biome.HeightAboveSeaLevel != null && biome.HeightAboveSeaLevel.Min > 0)
+            return false;
+            
+        // Don't assign ocean biomes to land
+        if (hex.HeightAboveSeaLevel > 0 && biome.HeightAboveSeaLevel != null && biome.HeightAboveSeaLevel.Max <= 0)
+            return false;
+            
+        return true;
     }
 
     /// <summary>

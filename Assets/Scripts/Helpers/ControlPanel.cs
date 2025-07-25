@@ -20,7 +20,7 @@ public class ControlPanel : MonoBehaviour
     {
         if (infoPanel != null && hexGrid != null)
         {
-            string activeView = GameSettings.ActiveOverlay == "None" ? "Biome" : GameSettings.ActiveOverlay;
+            string activeView = GameSettings.ActiveOverlay == "BiomeColour" ? "BiomeColour" : GameSettings.ActiveOverlay;
             
             // Calculate averages for land hexes only
             float totalHeight = 0f;
@@ -30,6 +30,8 @@ public class ControlPanel : MonoBehaviour
             float totalWindIntensity = 0f;
             int landHexCount = 0;
             var hexagons = hexGrid.GetHexagons();
+            
+            if (hexagons == null) return; // Safety check
             
             for (int i = 0; i < hexagons.GetLength(0); i++)
             {

@@ -684,35 +684,6 @@
                 "Max": 4
             },
             "NearOcean": true
-        },
-        {
-            "Name": "Stormy Temperate",
-            "Image": "Tiles/stormy-a-color.png",
-            "Colour": "#4682B4",
-            "HeightAboveSeaLevel": {
-                "Min": 1,
-                "Max": 1000
-            },
-            "Temperature": {
-                "Min": 5,
-                "Max": 25
-            },
-            "Rainfall": {
-                "Min": 40,
-                "Max": 80
-            },
-            "SurfaceWater": {
-                "Min": 0,
-                "Max": 200
-            },
-            "Terrain": {
-                "Min": 1,
-                "Max": 3
-            },
-            "WindIntensity": {
-                "Min": 70,
-                "Max": 100
-            }
         }
     ]
 }

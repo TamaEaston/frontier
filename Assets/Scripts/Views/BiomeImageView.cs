@@ -2,15 +2,15 @@ using UnityEngine;
 using Helpers;
 
 /// <summary>
-/// Biome view mode - shows detailed biome sprites with biome colors
-/// Key: 0 - Default view showing the natural terrain appearance
+/// Biome image view mode - shows detailed biome sprites with biome colors
+/// Key: 2 - Shows biome sprites overlaid on background colors
 /// </summary>
-public class BiomeView : IHexagonView
+public class BiomeImageView : IHexagonView
     {
         private HexGrid hexGrid;
         private HexGridColours colorHelper;
         
-        public string ViewName => "Biome";
+        public string ViewName => "BiomeImage";
         
         public void Initialize(HexGrid hexGrid)
         {
@@ -22,9 +22,19 @@ public class BiomeView : IHexagonView
         {
             if (hexagon == null || renderer == null) return;
             
+            // Check for all water features first (oceans, lakes, glaciers) using same logic as other views
+            Color waterColor = colorHelper.GetStandardWaterColour(hexagon.HeightAboveSeaLevel, hexagon.SurfaceWater, hexagon.Temperature);
+            if (waterColor != Color.clear)
+            {
+                // Use standardized water color (includes ocean depth gradient)
+                renderer.RenderSolidColor(hexagon, waterColor);
+                return;
+            }
+            
+            // Land tiles only - use biome sprites and colors
             if (hexagon.Biome != null)
             {
-                // Parse biome color from hex string
+                // Parse biome color from hex string for land biomes
                 Color biomeColor = Color.white;
                 if (ColorUtility.TryParseHtmlString(hexagon.Biome.Colour, out biomeColor))
                 {
@@ -43,15 +53,15 @@ public class BiomeView : IHexagonView
                 else
                 {
                     Debug.LogError($"Invalid biome color string: {hexagon.Biome.Colour}");
-                    // Use fallback color calculation
-                    Color fallbackColor = GetHexagonColor(hexagon);
+                    // Use fallback color calculation for land
+                    Color fallbackColor = GetLandBiomeColor(hexagon);
                     renderer.RenderSolidColor(hexagon, fallbackColor);
                 }
             }
             else
             {
-                // No biome assigned - use calculated color
-                Color defaultColor = GetHexagonColor(hexagon);
+                // No biome assigned to land tile - use calculated land color
+                Color defaultColor = GetLandBiomeColor(hexagon);
                 renderer.RenderSolidColor(hexagon, defaultColor);
             }
         }
@@ -68,29 +78,63 @@ public class BiomeView : IHexagonView
         
         public void OnViewActivated()
         {
-            Debug.Log("Biome view activated - showing detailed terrain sprites");
+            Debug.Log("BiomeImage view activated - showing detailed terrain sprites");
         }
         
         public void OnViewDeactivated()
         {
-            Debug.Log("Biome view deactivated");
+            Debug.Log("BiomeImage view deactivated");
         }
         
         public Color GetHexagonColor(Hexagon hexagon)
         {
             if (hexagon == null) return Color.white;
             
-            // Use the existing biome color calculation as fallback
-            return colorHelper.GetBiomeColour(
-                hexagon.AltitudeVsSeaLevel, 
-                hexagon.SurfaceWater, 
-                hexagon.Temperature
-            );
+            // Check for all water features first (oceans, lakes, glaciers) using same logic as other views
+            Color waterColor = colorHelper.GetStandardWaterColour(hexagon.HeightAboveSeaLevel, hexagon.SurfaceWater, hexagon.Temperature);
+            if (waterColor != Color.clear)
+            {
+                return waterColor;
+            }
+            
+            // Return land biome color
+            return GetLandBiomeColor(hexagon);
+        }
+        
+        /// <summary>
+        /// Get color for land tiles only (excludes water features)
+        /// </summary>
+        private Color GetLandBiomeColor(Hexagon hexagon)
+        {
+            if (hexagon == null) return Color.white;
+            
+            // For land tiles, use the original biome color calculation but exclude water
+            // This handles cases where no biome is assigned to land
+            if (hexagon.Temperature < -5)
+            {
+                // Glacial/ice areas on land
+                float t = Mathf.InverseLerp(0, 5000, hexagon.HeightAboveSeaLevel);
+                return Color.Lerp(new Color(0.9f, 0.9f, 0.9f), Color.white, t);
+            }
+            else if (hexagon.HeightAboveSeaLevel <= 50)
+            {
+                return new Color(0.93f, 0.79f, 0.69f); // Yellow Sand
+            }
+            else if (hexagon.HeightAboveSeaLevel <= 2500)
+            {
+                float t = Mathf.InverseLerp(51, 2500, hexagon.HeightAboveSeaLevel);
+                return Color.Lerp(new Color(0.5f, 0.8f, 0.2f), new Color(0.13f, 0.55f, 0.13f), t); // Grass Green to Forest Green
+            }
+            else
+            {
+                float t = Mathf.InverseLerp(2501, 5000, hexagon.HeightAboveSeaLevel);
+                return Color.Lerp(new Color(0.5f, 0.5f, 0.5f), new Color(0.8f, 0.8f, 0.8f), t); // Rock Grey to Light Rock Grey
+            }
         }
         
         public bool ShouldShowOverlay(Hexagon hexagon)
         {
-            // Biome view shows rivers as overlays
+            // BiomeImage view shows rivers as overlays
             return hexagon.RiverWidth > 0 && hexagon.LowestNeighbour != null && hexagon.AltitudeVsSeaLevel > 0;
         }
         

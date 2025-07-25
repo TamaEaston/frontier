@@ -160,13 +160,13 @@ namespace Helpers
         }
 
         /// <summary>
-        /// Get standardized water colors for Rivers, Lakes, Glaciers & Frozen Lakes
+        /// Get standardized water colors for Rivers, Lakes & Frozen Lakes
         /// Used consistently across all views to match Biome view standards
         /// </summary>
         public Color GetStandardWaterColour(float heightAboveSeaLevel, float surfaceWater, float temperature)
         {
-            // Ocean/Sea (below sea level)
-            if (heightAboveSeaLevel < 0)
+            // Ocean/Sea (at or below sea level)
+            if (heightAboveSeaLevel <= 0)
             {
                 if (temperature > -10)
                 {
@@ -189,12 +189,6 @@ namespace Helpers
                 {
                     return new Color(0.6f, 0.8f, 1.0f); // Light Blue (Frozen Lakes)
                 }
-            }
-            // Glaciers (land with temperature < -5, but no surface water)
-            else if (temperature < -5)
-            {
-                float t = Mathf.InverseLerp(0, 5000, heightAboveSeaLevel);
-                return Color.Lerp(new Color(0.9f, 0.9f, 0.9f), Color.white, t); // Light Grey to White (Glaciers)
             }
             
             // Not a water feature - return transparent to indicate no water color needed

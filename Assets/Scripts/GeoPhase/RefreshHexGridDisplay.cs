@@ -51,7 +51,7 @@ public class RefreshHexGridDisplay
                 {
                     altitudeColour = hexGrid.colours.GetBiomeColour(hex.AltitudeVsSeaLevel, (float)hex.SurfaceWater, (float)hex.Temperature);
                 }
-                else if (GameSettings.ActiveOverlay == "None")
+                else if (GameSettings.ActiveOverlay == "BiomeColour" || GameSettings.ActiveOverlay == "BiomeImage")
                 {
                     if (hex.Biome != null)
                     {
@@ -93,7 +93,7 @@ public class RefreshHexGridDisplay
                 }
 
                 // For non-biome views, use a simple sprite so colors render properly
-                if (GameSettings.ActiveOverlay != "None")
+                if (GameSettings.ActiveOverlay != "BiomeColour" && GameSettings.ActiveOverlay != "BiomeImage")
                 {
                     // Use a basic white sprite or keep existing sprite but rely on color overlay
                     // The color overlay will mask the sprite appearance

@@ -319,7 +319,7 @@ public class HexGrid : MonoBehaviour
         }
         else if (GameSettings.ActiveOverlay == Overlay)
         {
-            GameSettings.ActiveOverlay = "None";
+            GameSettings.ActiveOverlay = "BiomeColour";
         }
         UnityEngine.Debug.Log("Active Overlay: " + GameSettings.ActiveOverlay);
         

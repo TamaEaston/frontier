@@ -116,7 +116,7 @@ public class Hexagon : MonoBehaviour
                 GameSettings.EditMode = "None";
                 UnityEngine.Debug.Log("Sink Hole created");
                 Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-                GameSettings.ActiveOverlay = "None";
+                GameSettings.ActiveOverlay = "BiomeColour";
                 hexGrid.RefreshDisplay(false);
             }
             else if (GameSettings.EditMode == "CreateVolcano")
@@ -125,7 +125,7 @@ public class Hexagon : MonoBehaviour
                 GameSettings.EditMode = "None";
                 UnityEngine.Debug.Log("Volcano created");
                 Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-                GameSettings.ActiveOverlay = "None";
+                GameSettings.ActiveOverlay = "BiomeColour";
                 hexGrid.RefreshDisplay(false);
             }
             else if (GameSettings.EditMode == "CreateRandomPlate")

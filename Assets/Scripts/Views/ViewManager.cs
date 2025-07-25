@@ -32,16 +32,17 @@ public class ViewManager
             views = new Dictionary<string, IHexagonView>();
             
             // Create and register all view modes
-            RegisterView("None", new BiomeView());
-            RegisterView("Magma", new MagmaView());
-            RegisterView("Altitude", new AltitudeView());
-            RegisterView("Weather", new WeatherView());
-            RegisterView("Temperature", new TemperatureView());
-            RegisterView("Fertility", new FertilityView());
-            RegisterView("Terrain", new TerrainQuartileView());
+            RegisterView("BiomeColour", new BiomeColourView());      // Key 1
+            RegisterView("BiomeImage", new BiomeImageView());        // Key 2
+            RegisterView("Magma", new MagmaView());                  // Key 3
+            RegisterView("Altitude", new AltitudeView());            // Key 4
+            RegisterView("Weather", new WeatherView());              // Key 5
+            RegisterView("Temperature", new TemperatureView());      // Key 6
+            RegisterView("Fertility", new FertilityView());          // Key 7
+            RegisterView("Terrain", new TerrainQuartileView());      // Key 8
             
-            // Set default view
-            SetActiveView("None");
+            // Set default view (BiomeColour)
+            SetActiveView("BiomeColour");
         }
         
         /// <summary>
@@ -83,7 +84,7 @@ public class ViewManager
         /// <returns>Current view name</returns>
         public string GetActiveViewName()
         {
-            return currentView?.ViewName ?? "None";
+            return currentView?.ViewName ?? "BiomeColour";
         }
         
         /// <summary>
@@ -137,36 +138,39 @@ public class ViewManager
             switch (keyCode)
             {
                 case KeyCode.Alpha1:
-                    targetView = "None";
+                    targetView = "BiomeColour";
                     break;
                 case KeyCode.Alpha2:
-                    targetView = "Magma";
+                    targetView = "BiomeImage";
                     break;
                 case KeyCode.Alpha3:
-                    targetView = "Altitude";
+                    targetView = "Magma";
                     break;
                 case KeyCode.Alpha4:
-                    targetView = "Weather";
+                    targetView = "Altitude";
                     break;
                 case KeyCode.Alpha5:
-                    targetView = "Temperature";
+                    targetView = "Weather";
                     break;
                 case KeyCode.Alpha6:
-                    targetView = "Fertility";
+                    targetView = "Temperature";
                     break;
                 case KeyCode.Alpha7:
+                    targetView = "Fertility";
+                    break;
+                case KeyCode.Alpha8:
                     targetView = "Terrain";
                     break;
             }
             
             if (targetView != null)
             {
-                // Toggle view: if already active, switch to None; otherwise switch to target
+                // Toggle view: if already active, switch to BiomeColour; otherwise switch to target
                 string currentViewName = GetActiveViewName();
-                if (currentViewName == targetView && targetView != "None")
+                if (currentViewName == targetView && targetView != "BiomeColour")
                 {
-                    SetActiveView("None");
-                    GameSettings.ActiveOverlay = "None";
+                    SetActiveView("BiomeColour");
+                    GameSettings.ActiveOverlay = "BiomeColour";
                 }
                 else
                 {
