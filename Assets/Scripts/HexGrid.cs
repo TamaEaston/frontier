@@ -68,7 +68,7 @@ public class HexGrid : MonoBehaviour
         // Set fixed climate assignment for entire map lifecycle (randomized once)
         IsNorthArctic = UnityEngine.Random.value > 0.5f;
 
-        NumberOfPlates = Mathf.Min(NumberOfPlates, 24); // Apply the restriction
+        NumberOfPlates = UnityEngine.Random.Range(18, 37); // Random plate count between 18-36
         hexagons = new Hexagon[Width, Height];
         arrows = new Arrow[Width, Height];
         riverLines = new RiverOverlay[Width, Height];
@@ -156,13 +156,7 @@ public class HexGrid : MonoBehaviour
         }
 
         // Generate TectonicPlates
-        int NumbersOfHexagons = Width * Height;
-        MinHexagonsPerPlate = NumbersOfHexagons / NumberOfPlates;
-        for (int i = 0; i < NumberOfPlates; i++)
-        {
-            TectonicPlateGenerator generator = new TectonicPlateGenerator();
-            generator.GenerateTectonicPlate(hexagons, Width, Height, tectonicPlates, MinHexagonsPerPlate, null);
-        }
+        GenerateTectonicPlates();
 
         System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start();
@@ -557,8 +551,26 @@ public class HexGrid : MonoBehaviour
         // Reset Era to 0
         Era = 0;
         
-        // Set new random climate assignment
+        // Set new random climate assignment and plate configuration for complete geological reset
         IsNorthArctic = UnityEngine.Random.value > 0.5f;
+        NumberOfPlates = UnityEngine.Random.Range(18, 37); // Random plate count between 18-36
+        
+        // Reset all hexagon properties to initial state
+        for (int i = 0; i < Width; i++)
+        {
+            for (int j = 0; j < Height; j++)
+            {
+                Hexagon hex = hexagons[i, j];
+                
+                // Reset to initial values like in Start()
+                hex.Altitude = 9500; // Temporary deep ocean level
+                hex.AltitudeOld = hex.Altitude;
+                hex.MagmaIntensity = 25;
+                hex.MagmaDirection = 90;
+                hex.Rainfall = 25;
+                hex.SolarIntensity = 0f;
+            }
+        }
         
         // Regenerate continental terrain
         GenerateContinentalTerrain();
@@ -568,18 +580,13 @@ public class HexGrid : MonoBehaviour
         edgePhase.ExecuteEdgeGuard();
         
         // Generate new tectonic plates
-        tectonicPlates.Clear();
-        for (int i = 0; i < NumberOfPlates; i++)
-        {
-            TectonicPlateGenerator generator = new TectonicPlateGenerator();
-            generator.GenerateTectonicPlate(hexagons, Width, Height, tectonicPlates, MinHexagonsPerPlate, null);
-        }
+        GenerateTectonicPlates();
         
         // Run initial geological phases like in Start()
         System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start();
         GeoPhase phase = new GeoPhase(this, biomes);
-        int NumberOfGeoPhases = 25;
+        int NumberOfGeoPhases = 100;
         for (int i = 0; i < NumberOfGeoPhases; i++)
         {
             Era += 1; // Count initial generation cycles
@@ -610,6 +617,21 @@ public class HexGrid : MonoBehaviour
         }
         
         UnityEngine.Debug.Log($"New map generated! Climate: {(IsNorthArctic ? "North Arctic" : "South Arctic")}");
+    }
+
+    /// <summary>
+    /// Generate tectonic plates for the simulation
+    /// </summary>
+    private void GenerateTectonicPlates()
+    {
+        tectonicPlates.Clear();
+        int NumbersOfHexagons = Width * Height;
+        MinHexagonsPerPlate = NumbersOfHexagons / NumberOfPlates;
+        for (int i = 0; i < NumberOfPlates; i++)
+        {
+            TectonicPlateGenerator generator = new TectonicPlateGenerator();
+            generator.GenerateTectonicPlate(hexagons, Width, Height, tectonicPlates, MinHexagonsPerPlate, null);
+        }
     }
 
 }
